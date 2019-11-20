@@ -1,5 +1,6 @@
 package com.example.wyrmprint.injection.component
 
+import com.example.wyrmprint.data.remote.DragaliaLifeApi
 import com.example.wyrmprint.data.remote.DragaliaLifeService
 import com.example.wyrmprint.util.DragaliaLifeUtil
 import dagger.Module
@@ -20,4 +21,9 @@ class DragaliaLifeModule {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
             .create(DragaliaLifeService::class.java)
+
+    @Singleton
+    @Provides
+    fun provideDragaliaApi(dragaliaService: DragaliaLifeService) =
+        DragaliaLifeApi(dragaliaService)
 }

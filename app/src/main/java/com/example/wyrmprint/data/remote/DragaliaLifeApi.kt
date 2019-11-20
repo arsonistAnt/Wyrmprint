@@ -17,7 +17,7 @@ class DragaliaLifeApi @Inject constructor(private var service: DragaliaLifeServi
      * @param comicId the id of [ComicStrip] given by the api.
      * @return [Observable] object that emits a [ComicStrip] item.
      */
-    fun getComicStripDetails(comicId: Int): Observable<ComicStrip> =
+    fun fetchComicStripDetails(comicId: Int): Observable<ComicStrip> =
         service.comicDetail(comicId)
             .subscribeOn(Schedulers.io())
             .concatMap {
@@ -30,7 +30,7 @@ class DragaliaLifeApi @Inject constructor(private var service: DragaliaLifeServi
      * @param pageNum the page number of the thumbnail items.
      * @return [Maybe] that emits list of Thumbnail items.
      */
-    fun getComicStripPage(pageNum: Int): Maybe<List<ThumbnailItem>> =
+    fun fetchComicStripPage(pageNum: Int): Maybe<List<ThumbnailItem>> =
         service.thumbnailPage(pageNum)
             .subscribeOn(Schedulers.io())
 }

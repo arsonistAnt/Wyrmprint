@@ -1,3 +1,7 @@
 <resources>
+    <!--    Main Navigation Items-->
     <string name="app_name">Wyrmprint</string>
+    <string name="item_browse_string">Browse</string>
+    <string name="item_recent_string">Recent</string>
+    <string name="item_setting_string">Setting</string>
 </resources>
