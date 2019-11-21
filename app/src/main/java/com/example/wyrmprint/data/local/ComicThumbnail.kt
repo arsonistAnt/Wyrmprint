@@ -5,7 +5,7 @@ import com.squareup.moshi.Json
 /**
  * Json data class that holds thumbnail information on the comic strip.
  */
-data class ThumbnailItem(
+data class ComicThumbnail(
     @field:Json(name = "id") override var id: Int,
     @field:Json(name = "title") override var title: String,
     @field:Json(name = "episode_num") override var episodeNumber: Int,

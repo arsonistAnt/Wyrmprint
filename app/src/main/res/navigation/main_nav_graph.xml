@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main_nav_graph">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/browseFragment">
 
+    <fragment
+        android:id="@+id/browseFragment"
+        android:name="com.example.wyrmprint.ui.browse.BrowseFragment"
+        android:label="BrowseFragment" />
 </navigation>

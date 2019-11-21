@@ -1,4 +1,4 @@
-package com.example.wyrmprint
+package com.example.wyrmprint.ui.base
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -8,18 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import coil.api.load
+import com.example.wyrmprint.R
 import com.example.wyrmprint.databinding.ActivityMainBinding
-import com.example.wyrmprint.injection.module.DaggerComicRepoModule
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mainBinding: ActivityMainBinding
-    private val rxDisposable: CompositeDisposable = CompositeDisposable()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,28 +26,14 @@ class MainActivity : AppCompatActivity() {
         addBottomNavIcons(mainBinding.mainNavbarBottom.menu)
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        // TODO: Placeholder code for testing purposes, will be removed on next commit
-        val imageV = mainBinding.mainNavHost
-        val dragaliaApi =
-            DaggerComicRepoModule.builder()
-                .build()
-                .getComicRepo()
-        rxDisposable.add(dragaliaApi.getThumbnailPage(0)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                imageV.load(it[0].thumbnailLarge)
-            })
-        // TODO: Placeholder code for testing purposes, will be removed on next commit
-    }
-
     /**
      * Initialize data binding to view.
      */
     private fun bindingCreate() {
-        mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        mainBinding = DataBindingUtil.setContentView(
+            this,
+            R.layout.activity_main
+        )
     }
 
     /**

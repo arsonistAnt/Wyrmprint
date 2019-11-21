@@ -44,6 +44,7 @@ dependencies {
     def retrofit_ver = "2.6.2"
     def dagger2_ver = "2.25.2"
     def appcompat_ver = "1.1.0"
+    def lifecycle_ver = "2.1.0"
 
     // Project Generated
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -77,9 +78,11 @@ dependencies {
     // Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
-    // Navigation AAC
+    // Architecture Components
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_ver"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_ver"
+    implementation "androidx.recyclerview:recyclerview:1.1.0-rc01"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ver"
 
     // Android-Iconics
     implementation "com.mikepenz:iconics-core:4.0.2"
@@ -89,4 +92,8 @@ dependencies {
 
     // Coil
     implementation "io.coil-kt:coil:0.8.0"
+
+    // Fast Adapter
+    implementation "com.mikepenz:fastadapter:4.1.1"
+
 }

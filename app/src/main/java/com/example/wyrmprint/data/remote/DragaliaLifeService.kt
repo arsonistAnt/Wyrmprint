@@ -2,7 +2,7 @@ package com.example.wyrmprint.data.remote
 
 
 import com.example.wyrmprint.data.local.ComicStrip
-import com.example.wyrmprint.data.local.ThumbnailItem
+import com.example.wyrmprint.data.local.ComicThumbnail
 import com.example.wyrmprint.util.DragaliaLifeUtil
 import com.example.wyrmprint.util.DragaliaLifeUtil.Companion.formDataMap
 import io.reactivex.Maybe
@@ -26,5 +26,5 @@ interface DragaliaLifeService {
     fun thumbnailPage(
         @Path(DragaliaLifeUtil.thumbnailPath) pageNumber: Int,
         @FieldMap formData: Map<String, String> = formDataMap
-    ): Maybe<List<ThumbnailItem>>
+    ): Maybe<List<ComicThumbnail>>
 }
