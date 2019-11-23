@@ -3,19 +3,16 @@ package com.example.wyrmprint.ui.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.wyrmprint.injection.module.DaggerComicRepoModule
+import com.example.wyrmprint.data.remote.repository.ComicRepository
 import com.example.wyrmprint.ui.browse.adapters.ThumbnailItem
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import timber.log.Timber
+import javax.inject.Inject
 
-class BrowserViewModel : ViewModel() {
-    // TODO: Injection
-    private val comicRepo =
-        DaggerComicRepoModule.builder()
-            .build()
-            .getComicRepo()
+class BrowserViewModel @Inject constructor(private val comicRepo: ComicRepository) : ViewModel() {
+
     // TODO: Injection
     private var disposables = CompositeDisposable()
 

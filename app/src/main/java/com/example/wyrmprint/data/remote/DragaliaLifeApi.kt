@@ -6,10 +6,13 @@ import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * A class that retrieves comic strip information from Nintendo's Dragalia Lost API.
  */
+
+@Singleton
 class DragaliaLifeApi @Inject constructor(private var service: DragaliaLifeService) {
     /**
      * Get [ComicStrip] details from the api.

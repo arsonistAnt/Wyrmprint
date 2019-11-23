@@ -10,13 +10,20 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.example.wyrmprint.R
 import com.example.wyrmprint.databinding.ActivityMainBinding
+import com.example.wyrmprint.injection.InjectionProvider
+import com.example.wyrmprint.injection.component.ActivityComponent
+import com.example.wyrmprint.injection.component.DaggerActivityComponent
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import timber.log.Timber
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), InjectionProvider {
     private lateinit var mainBinding: ActivityMainBinding
 
+    // Main component that provides dependencies to all Fragments.
+    override val component: ActivityComponent by lazy {
+        DaggerActivityComponent.create()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
