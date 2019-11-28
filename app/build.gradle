@@ -10,6 +10,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.example.wyrmprint"
+        multiDexEnabled true
         minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
@@ -83,6 +84,8 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_ver"
     implementation "androidx.recyclerview:recyclerview:1.1.0-rc01"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ver"
+    implementation "androidx.paging:paging-runtime:2.1.0"
+    implementation "androidx.paging:paging-runtime-ktx:2.1.0"
 
     // Android-Iconics
     implementation "com.mikepenz:iconics-core:4.0.2"
@@ -95,5 +98,9 @@ dependencies {
 
     // Fast Adapter
     implementation "com.mikepenz:fastadapter:4.1.1"
+    implementation "com.mikepenz:fastadapter-extensions-paged:4.1.1"
+    implementation "com.mikepenz:fastadapter-extensions-scroll:4.1.1"
+    implementation "com.mikepenz:fastadapter-extensions-ui:4.1.1"
+    implementation "com.mikepenz:fastadapter-extensions-utils:4.1.1"
 
 }

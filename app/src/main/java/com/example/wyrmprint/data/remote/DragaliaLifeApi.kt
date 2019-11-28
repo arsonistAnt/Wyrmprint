@@ -1,7 +1,7 @@
 package com.example.wyrmprint.data.remote
 
 import com.example.wyrmprint.data.local.ComicStrip
-import com.example.wyrmprint.data.local.ComicThumbnail
+import com.example.wyrmprint.data.model.ComicThumbnailData
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -28,12 +28,12 @@ class DragaliaLifeApi @Inject constructor(private var service: DragaliaLifeServi
             }
 
     /**
-     * Get list of [ComicThumbnail] selections from a page.
+     * Get list of [ComicThumbnailData] selections from a page.
      *
      * @param pageNum the page number of the thumbnail items.
      * @return [Maybe] that emits list of Thumbnail items.
      */
-    fun fetchComicStripPage(pageNum: Int): Maybe<List<ComicThumbnail>> =
+    fun fetchComicStripPage(pageNum: Int): Maybe<List<ComicThumbnailData>> =
         service.thumbnailPage(pageNum)
             .subscribeOn(Schedulers.io())
 }
