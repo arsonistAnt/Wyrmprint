@@ -12,35 +12,32 @@
         android:paddingRight="16dp"
         android:paddingBottom="12dp">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/thumbnail_item"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="5:4"
+            android:background="@color/dark_red"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="H,5:4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/thumbnail_item"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@color/dark_red"
-                android:scaleType="centerCrop" />
-
-            <TextView
-                android:id="@+id/thumbnail_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:padding="4dp"
-                android:text="@string/title_place_holder"
-                android:textColor="@color/white"
-                android:textSize="12sp" />
-
-        </LinearLayout>
+        <TextView
+            android:id="@+id/thumbnail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:padding="8dp"
+            android:text="@string/title_place_holder"
+            android:textColor="@color/white"
+            android:fontFamily="@font/ms_pgothic"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/thumbnail_item"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

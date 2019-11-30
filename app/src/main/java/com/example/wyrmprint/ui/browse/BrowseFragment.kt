@@ -1,5 +1,6 @@
 package com.example.wyrmprint.ui.browse
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,9 +34,14 @@ import kotlinx.android.synthetic.main.activity_main.*
 @ExperimentalPagedSupport
 class BrowseFragment : Fragment() {
     private lateinit var binding: FragBrowseLayoutBinding
-    private lateinit var browsePageAdapter: GenericPagedModelAdapter<ComicThumbnailData>
-    private lateinit var progressFooterAdapter: GenericItemAdapter
+    private lateinit var browsePageItemAdapter: GenericPagedModelAdapter<ComicThumbnailData>
+    private lateinit var footerItemAdapter: GenericItemAdapter
+    private lateinit var fastAdapter: GenericFastAdapter
     private val browserViewModel: BrowserViewModel by viewModel { injector.browserViewModel }
+
+    // Default span count for different orientations.
+    private val SPAN_COUNT_PORTRAIT = 2
+    private val SPAN_COUNT_LANDSCAPE = 4
 
     companion object {
         // Diff config for the comic thumbnail paged model adapter.
@@ -75,11 +81,11 @@ class BrowseFragment : Fragment() {
      * Initialize any objects/views before use.
      */
     private fun initSetup() {
-        browsePageAdapter = GenericPagedModelAdapter(comicThumbnailDiff) { comicThumbnail ->
+        browsePageItemAdapter = GenericPagedModelAdapter(comicThumbnailDiff) { comicThumbnail ->
             // Wrap into ThumbnailItemView
             comicThumbnail.toThumbnailItemView()
         }
-        progressFooterAdapter = GenericItemAdapter()
+        footerItemAdapter = GenericItemAdapter()
         binding.browserViewModel = browserViewModel
         initBrowserViewModelObservables(browserViewModel)
         setDataSourceCallbacks()
@@ -92,34 +98,27 @@ class BrowseFragment : Fragment() {
      */
     private fun initBrowserRecyclerView(browser: RecyclerView) {
         // Create a generic fast adapter that will take in a paged model adapter and a generic item adapter.
-        val fastAdapter = GenericFastAdapter.with<IItem<*>, IAdapter<IItem<*>>>(
+        fastAdapter = GenericFastAdapter.with<IItem<*>, IAdapter<IItem<*>>>(
             listOf(
-                browsePageAdapter,
-                progressFooterAdapter
+                browsePageItemAdapter,
+                footerItemAdapter
             )
         ).apply {
             registerTypeInstance(ThumbnailItemView(null))
         }
 
         // Init grid layout manager & set span size lookup for ProgressItem.
-        val gridLayoutManager = GridLayoutManager(requireContext(), 2).apply {
-            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int {
-                    if (fastAdapter.getItemViewType(position) == ProgressItem().type)
-                        return 2
-                    return 1
-                }
-            }
-        }
+        val gridLayoutManager = getGridLayoutManager(fastAdapter)
+
         browser.apply {
             // Ui,
             layoutManager = gridLayoutManager
             // Config adapter
             adapter = fastAdapter
-            addOnScrollListener(object : EndlessRecyclerOnScrollListener(progressFooterAdapter) {
+            addOnScrollListener(object : EndlessRecyclerOnScrollListener(footerItemAdapter) {
                 override fun onLoadMore(currentPage: Int) {
-                    progressFooterAdapter.clear()
-                    progressFooterAdapter.add(ProgressItem())
+                    footerItemAdapter.clear()
+                    footerItemAdapter.add(ProgressItem())
                 }
             })
         }
@@ -131,11 +130,13 @@ class BrowseFragment : Fragment() {
      * @param browserViewModel the BrowserViewModel who's observables that will be subscribed to.
      */
     private fun initBrowserViewModelObservables(browserViewModel: BrowserViewModel) {
-        browserViewModel.thumbnailDataItemPageList.observe(
-            viewLifecycleOwner,
-            Observer { thumbnailPagedList ->
-                browsePageAdapter.submitList(thumbnailPagedList)
-            })
+        browserViewModel.apply {
+            thumbnailDataItemPageList.observe(
+                viewLifecycleOwner,
+                Observer { thumbnailPagedList ->
+                    browsePageItemAdapter.submitList(thumbnailPagedList)
+                })
+        }
     }
 
     /**
@@ -146,7 +147,41 @@ class BrowseFragment : Fragment() {
             requireActivity().browser_progressBar.visibility = View.GONE
         }
         browserViewModel.setOnLoadedMoreThumbnail {
-            progressFooterAdapter.clear()
+            footerItemAdapter.clear()
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        footerItemAdapter.clear()
+        reconfigRecycler(binding.browserRecycler, fastAdapter)
+    }
+
+    private fun getGridLayoutManager(fastAdapter: GenericFastAdapter): GridLayoutManager {
+        val currentSpanCount = when (resources.configuration.orientation) {
+            Configuration.ORIENTATION_LANDSCAPE -> SPAN_COUNT_LANDSCAPE
+            else -> SPAN_COUNT_PORTRAIT
+        }
+        return GridLayoutManager(requireContext(), currentSpanCount).apply {
+            spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    if (fastAdapter.getItemViewType(position) == ProgressItem().type)
+                        return 2
+                    return 1
+                }
+            }
+        }
+    }
+
+    /**
+     * Reconfigure the RecyclerView on orientation change.
+     *
+     * @see onConfigurationChanged
+     */
+    private fun reconfigRecycler(
+        recycler: RecyclerView,
+        fastAdapter: GenericFastAdapter
+    ) {
+        recycler.layoutManager = getGridLayoutManager(fastAdapter)
     }
 }
