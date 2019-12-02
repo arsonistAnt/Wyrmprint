@@ -20,15 +20,20 @@ open class ThumbnailItemView(private val thumbnailData: ComicThumbnailData?) :
 
     class ThumbnailCardHolder(view: View) : FastAdapter.ViewHolder<ThumbnailItemView>(view) {
         private val thumbnailImage: ImageView? = view.findViewById(R.id.thumbnail_item)
-        private val thumnailTitle: TextView? = view.findViewById(R.id.thumbnail_title)
+        private val thumbnailTitle: TextView? = view.findViewById(R.id.thumbnail_title)
+        private val thumbnailComicNum: TextView? = view.findViewById(R.id.comic_number)
 
         override fun bindView(item: ThumbnailItemView, payloads: MutableList<Any>) {
             thumbnailImage?.load(item.thumbnailData?.thumbnailLarge) {
                 placeholder(R.drawable.loading_placeholder)
             }
-            thumnailTitle?.text = item.thumbnailData?.title
+            thumbnailTitle?.text = item.thumbnailData?.title.toString()
+            thumbnailComicNum?.text = item.thumbnailData?.episodeNumber.toString()
         }
 
-        override fun unbindView(item: ThumbnailItemView) {}
+        override fun unbindView(item: ThumbnailItemView) {
+            thumbnailTitle?.text = ""
+            thumbnailComicNum?.text = ""
+        }
     }
 }
