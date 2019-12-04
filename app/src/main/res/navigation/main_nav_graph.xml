@@ -7,5 +7,20 @@
     <fragment
         android:id="@+id/browseFragment"
         android:name="com.example.wyrmprint.ui.browse.BrowseFragment"
-        android:label="BrowseFragment" />
+        android:label="BrowseFragment">
+        <action
+            android:id="@+id/action_browseFragment_to_comicPagerFragment"
+            app:destination="@id/comicPagerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/comicPagerFragment"
+        android:name="com.example.wyrmprint.ui.comicpager.ComicPagerFragment"
+        android:label="ComicPagerFragment">
+        <argument
+            android:name="comic_id"
+            app:argType="integer" />
+        <argument
+            android:name="comic_url"
+            app:argType="string" />
+    </fragment>
 </navigation>

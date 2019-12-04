@@ -6,6 +6,11 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
 
+apply plugin: "androidx.navigation.safeargs.kotlin"
+
+
+
+
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -93,6 +98,9 @@ dependencies {
     // Android-Iconics Custom Views & CMD Icons
     implementation 'com.mikepenz:community-material-typeface:3.5.95.1-kotlin@aar'
 
+    // PhotoView
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+
     // Coil
     implementation "io.coil-kt:coil:0.8.0"
 
@@ -102,5 +110,8 @@ dependencies {
     implementation "com.mikepenz:fastadapter-extensions-scroll:4.1.1"
     implementation "com.mikepenz:fastadapter-extensions-ui:4.1.1"
     implementation "com.mikepenz:fastadapter-extensions-utils:4.1.1"
+
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
+    kapt 'com.github.bumptech.glide:compiler:4.10.0'
 
 }

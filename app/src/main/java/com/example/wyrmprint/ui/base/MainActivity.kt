@@ -18,7 +18,7 @@ import com.mikepenz.iconics.typeface.library.community.material.CommunityMateria
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), InjectionProvider {
-    private lateinit var mainBinding: ActivityMainBinding
+    lateinit var mainBinding: ActivityMainBinding
 
     // Main component that provides dependencies to all Fragments.
     override val component: ActivityComponent by lazy {

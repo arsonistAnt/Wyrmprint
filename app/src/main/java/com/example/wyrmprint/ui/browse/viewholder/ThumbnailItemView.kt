@@ -9,7 +9,7 @@ import com.example.wyrmprint.data.model.ComicThumbnailData
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 
-open class ThumbnailItemView(private val thumbnailData: ComicThumbnailData?) :
+open class ThumbnailItemView(val thumbnailData: ComicThumbnailData?) :
     AbstractItem<ThumbnailItemView.ThumbnailCardHolder>() {
     override val layoutRes: Int
         get() = R.layout.thumbnail_item

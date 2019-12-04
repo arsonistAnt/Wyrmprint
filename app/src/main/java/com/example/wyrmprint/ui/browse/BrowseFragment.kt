@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -87,7 +88,7 @@ class BrowseFragment : Fragment() {
         }
         footerItemAdapter = GenericItemAdapter()
         binding.browserViewModel = browserViewModel
-        initBrowserViewModelObservables(browserViewModel)
+        initObservables(browserViewModel)
         setDataSourceCallbacks()
     }
 
@@ -105,6 +106,16 @@ class BrowseFragment : Fragment() {
             )
         ).apply {
             registerTypeInstance(ThumbnailItemView(null))
+            onClickListener = { view, adapter, item, position ->
+                (item as ThumbnailItemView).thumbnailData?.apply {
+                    val action = BrowseFragmentDirections.actionBrowseFragmentToComicPagerFragment(
+                        id,
+                        comicUrl
+                    )
+                    findNavController().navigate(action)
+                }
+                false
+            }
         }
 
         // Init grid layout manager & set span size lookup for ProgressItem.
@@ -129,7 +140,7 @@ class BrowseFragment : Fragment() {
      *
      * @param browserViewModel the BrowserViewModel who's observables that will be subscribed to.
      */
-    private fun initBrowserViewModelObservables(browserViewModel: BrowserViewModel) {
+    private fun initObservables(browserViewModel: BrowserViewModel) {
         browserViewModel.apply {
             thumbnailDataItemPageList.observe(
                 viewLifecycleOwner,
