@@ -108,9 +108,9 @@ class BrowseFragment : Fragment() {
             registerTypeInstance(ThumbnailItemView(null))
             onClickListener = { view, adapter, item, position ->
                 (item as ThumbnailItemView).thumbnailData?.apply {
-                    val action = BrowseFragmentDirections.actionBrowseFragmentToComicPagerFragment(
-                        id,
-                        comicUrl
+                    val action = BrowseFragmentDirections.actionBrowseFragmentToComicPagerActivity(
+                        comicUrl,
+                        id
                     )
                     findNavController().navigate(action)
                 }

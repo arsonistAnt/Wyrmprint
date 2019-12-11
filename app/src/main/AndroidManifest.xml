@@ -21,6 +21,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.base.MainReaderActivity"
+            android:parentActivityName=".ui.base.MainActivity"
+            android:configChanges="orientation|screenSize"></activity>
     </application>
 
 </manifest>

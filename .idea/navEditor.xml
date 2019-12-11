@@ -13,13 +13,13 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="-52" />
-                            <option name="y" value="112" />
+                            <option name="x" value="-171" />
+                            <option name="y" value="110" />
                           </Point>
                         </option>
                         <option name="myPositions">
                           <map>
-                            <entry key="action_browseFragment_to_comicPagerFragment">
+                            <entry key="action_browseFragment_to_comicPagerActivity">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -29,13 +29,13 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="comicPagerFragment">
+                  <entry key="comicPagerActivity">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="177" />
-                            <option name="y" value="112" />
+                            <option name="x" value="118" />
+                            <option name="y" value="116" />
                           </Point>
                         </option>
                       </LayoutPositions>

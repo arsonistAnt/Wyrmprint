@@ -9,18 +9,22 @@
         android:name="com.example.wyrmprint.ui.browse.BrowseFragment"
         android:label="BrowseFragment">
         <action
-            android:id="@+id/action_browseFragment_to_comicPagerFragment"
-            app:destination="@id/comicPagerFragment" />
+            android:id="@+id/action_browseFragment_to_comicPagerActivity"
+            app:destination="@id/comicPagerActivity"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
-    <fragment
-        android:id="@+id/comicPagerFragment"
-        android:name="com.example.wyrmprint.ui.comicpager.ComicPagerFragment"
-        android:label="ComicPagerFragment">
+    <activity
+        android:id="@+id/comicPagerActivity"
+        android:name="com.example.wyrmprint.ui.base.MainReaderActivity"
+        android:label="ComicPagerActivity">
+        <argument
+            android:name="comicUrl"
+            app:argType="string" />
         <argument
             android:name="comic_id"
             app:argType="integer" />
-        <argument
-            android:name="comic_url"
-            app:argType="string" />
-    </fragment>
+    </activity>
 </navigation>
