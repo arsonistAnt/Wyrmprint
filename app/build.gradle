@@ -98,8 +98,8 @@ dependencies {
     // Android-Iconics Custom Views & CMD Icons
     implementation 'com.mikepenz:community-material-typeface:3.5.95.1-kotlin@aar'
 
-    // PhotoView
-    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
+    // Custom PhotoView
+    implementation 'com.github.arsonistant:PhotoView:62f96ad'
 
     // Coil
     implementation "io.coil-kt:coil:0.8.0"

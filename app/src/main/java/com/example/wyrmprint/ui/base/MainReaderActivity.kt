@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.navArgs
+import com.example.wyrmprint.R
 import com.example.wyrmprint.injection.InjectionProvider
 import com.example.wyrmprint.injection.component.ActivityComponent
 import com.example.wyrmprint.injection.component.DaggerActivityComponent
@@ -16,6 +17,7 @@ class MainReaderActivity : AppCompatActivity(), InjectionProvider {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        setContentView(R.layout.activity_main_reader)
     }
 
     override fun onBackPressed() {

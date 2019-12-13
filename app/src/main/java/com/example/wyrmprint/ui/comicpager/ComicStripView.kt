@@ -1,10 +1,15 @@
 package com.example.wyrmprint.ui.comicpager
 
+import android.app.Activity
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Matrix
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.AttributeSet
+import android.view.DisplayCutout
 import android.view.View
+import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT
 import androidx.core.graphics.drawable.toBitmap
 import com.example.wyrmprint.util.ComicImageScaleUtil
 import com.example.wyrmprint.util.ZoomFactors
@@ -27,7 +32,10 @@ class ComicStripView : PhotoView, View.OnLayoutChangeListener {
 
     // Auto scale the drawable by default when it's set.
     var autoScaleWidth = true
-    // For
+
+    // Determines whether the device has a notch.
+    var displayObject: DisplayCutout? = null
+
     private var sysUiChanged = false
     // The current support matrix for this view, used to restore zoom scale & zoom position x y.
     private var currSuppMatrix = Matrix()
@@ -37,7 +45,7 @@ class ComicStripView : PhotoView, View.OnLayoutChangeListener {
 
     init {
         // Remove the attacher as its already listening by default implementation of the super class.
-        removeOnLayoutChangeListener(attacher as OnLayoutChangeListener)
+        removeOnLayoutChangeListener(attacher)
         addOnLayoutChangeListener(this)
     }
 
@@ -52,11 +60,13 @@ class ComicStripView : PhotoView, View.OnLayoutChangeListener {
         p7: Int,
         p8: Int
     ) {
-        if (!sysUiChanged)
+        if (!sysUiChanged) {
             attacher.onLayoutChange(p0, p1, p2, p3, p4, p5, p6, p7, p8)
-        else {
-            setSuppMatrix(currSuppMatrix)
+        }
+        if (sysUiChanged) {
             sysUiChanged = false
+            fitImageDrawableWidth(drawable)
+            setSuppMatrix(currSuppMatrix)
         }
     }
 
@@ -64,6 +74,31 @@ class ComicStripView : PhotoView, View.OnLayoutChangeListener {
         super.setImageDrawable(drawable)
         if (autoScaleWidth)
             fitImageDrawableWidth(drawable)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        // Get the DisplayCutout object to determine if a device has a notch.
+        displayObject = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            (context as Activity).window.decorView.rootWindowInsets.displayCutout
+        } else {
+            null
+        }
+    }
+
+    override fun onWindowSystemUiVisibilityChanged(visible: Int) {
+        super.onWindowSystemUiVisibilityChanged(visible)
+        // Handle sys ui visibility changes on devices that have notches.
+        if (isPieVersion() && !isLandscape()) {
+            val displayCutoutMode =
+                (context as Activity).window.attributes.layoutInDisplayCutoutMode
+            displayObject?.let {
+                if (displayCutoutMode == LAYOUT_IN_DISPLAY_CUTOUT_MODE_DEFAULT) {
+                    sysUiChanged = true
+                    getSuppMatrix(currSuppMatrix)
+                }
+            }
+        }
     }
 
     /**
@@ -79,18 +114,19 @@ class ComicStripView : PhotoView, View.OnLayoutChangeListener {
      * @param drawable the drawable in [ComicStripView]
      */
     private fun fitImageDrawableWidth(drawable: Drawable?) {
-        drawable?.run {
+        drawable?.let {
             if ((drawable.toBitmap().width > 0)
                 && this@ComicStripView.width > 0
             ) {
                 currZoomFactors =
                     ComicImageScaleUtil.calculateAllZoomFactors(this@ComicStripView, drawable)
                 setScaleConfig(currZoomFactors!!)
-                setScale(currZoomFactors!!.minimum, 0F, 0F, false)
-            } else
-                currZoomFactors?.apply {
-                    setScale(minimum, 0F, 0F, false)
-                }
+                scale = currZoomFactors!!.minimum
+            }
         }
     }
+
+    private fun isPieVersion(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
+    private fun isLandscape(): Boolean =
+        resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 }
