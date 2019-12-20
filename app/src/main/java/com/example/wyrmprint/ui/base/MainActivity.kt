@@ -13,6 +13,7 @@ import com.example.wyrmprint.databinding.ActivityMainBinding
 import com.example.wyrmprint.injection.InjectionProvider
 import com.example.wyrmprint.injection.component.ActivityComponent
 import com.example.wyrmprint.injection.component.DaggerActivityComponent
+import com.example.wyrmprint.injection.module.ContextModule
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import timber.log.Timber
@@ -22,7 +23,8 @@ class MainActivity : AppCompatActivity(), InjectionProvider {
 
     // Main component that provides dependencies to all Fragments.
     override val component: ActivityComponent by lazy {
-        DaggerActivityComponent.create()
+        val contextModule = ContextModule(this)
+        DaggerActivityComponent.builder().contextModule(contextModule).build()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -8,10 +8,15 @@ import com.example.wyrmprint.R
 import com.example.wyrmprint.injection.InjectionProvider
 import com.example.wyrmprint.injection.component.ActivityComponent
 import com.example.wyrmprint.injection.component.DaggerActivityComponent
+import com.example.wyrmprint.injection.module.ContextModule
 
 
 class MainReaderActivity : AppCompatActivity(), InjectionProvider {
-    override val component: ActivityComponent by lazy { DaggerActivityComponent.create() }
+    override val component: ActivityComponent by lazy {
+        val contextModule = ContextModule(this)
+        DaggerActivityComponent.builder().contextModule(contextModule).build()
+    }
+
     val safeArgs: MainReaderActivityArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {

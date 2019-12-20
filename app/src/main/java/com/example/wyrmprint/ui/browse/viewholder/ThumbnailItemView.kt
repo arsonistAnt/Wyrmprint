@@ -5,18 +5,24 @@ import android.widget.ImageView
 import android.widget.TextView
 import coil.api.load
 import com.example.wyrmprint.R
-import com.example.wyrmprint.data.model.ComicThumbnailData
+import com.example.wyrmprint.data.model.ThumbnailData
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 
-open class ThumbnailItemView(val thumbnailData: ComicThumbnailData?) :
+open class ThumbnailItemView(val thumbnailData: ThumbnailData?) :
     AbstractItem<ThumbnailItemView.ThumbnailCardHolder>() {
+    var isPlaceHolder = false
     override val layoutRes: Int
         get() = R.layout.thumbnail_item
     override val type: Int
         get() = R.id.thumbnail_item
 
-    override fun getViewHolder(v: View): ThumbnailCardHolder = ThumbnailCardHolder(v)
+    override fun getViewHolder(v: View): ThumbnailCardHolder = ThumbnailCardHolder(v).apply {
+        if (!isPlaceHolder) {
+            itemView.visibility = View.VISIBLE
+        } else
+            itemView.visibility = View.GONE
+    }
 
     class ThumbnailCardHolder(view: View) : FastAdapter.ViewHolder<ThumbnailItemView>(view) {
         private val thumbnailImage: ImageView? = view.findViewById(R.id.thumbnail_item)
@@ -24,11 +30,11 @@ open class ThumbnailItemView(val thumbnailData: ComicThumbnailData?) :
         private val thumbnailComicNum: TextView? = view.findViewById(R.id.comic_number)
 
         override fun bindView(item: ThumbnailItemView, payloads: MutableList<Any>) {
-            thumbnailImage?.load(item.thumbnailData?.thumbnailLarge) {
+            thumbnailImage?.load(item.thumbnailData?.thumbnailLargeUrl) {
                 placeholder(R.drawable.loading_placeholder)
             }
-            thumbnailTitle?.text = item.thumbnailData?.title.toString()
-            thumbnailComicNum?.text = item.thumbnailData?.episodeNumber.toString()
+            thumbnailTitle?.text = item.thumbnailData?.comicTitle.toString()
+            thumbnailComicNum?.text = item.thumbnailData?.comicNumber.toString()
         }
 
         override fun unbindView(item: ThumbnailItemView) {

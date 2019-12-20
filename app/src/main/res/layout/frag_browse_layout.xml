@@ -17,6 +17,7 @@
             android:id="@+id/browser_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="4dp" />
+            android:clipToPadding="false"
+            android:padding="4dp" />
     </LinearLayout>
 </layout>

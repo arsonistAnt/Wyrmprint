@@ -1,9 +1,12 @@
 package com.example.wyrmprint.data.remote.repository
 
+import androidx.lifecycle.LiveData
+import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import com.example.wyrmprint.data.model.ThumbnailDao
+import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.remote.DragaliaLifeApi
-import com.example.wyrmprint.data.remote.pager.DataSourceCallback
-import com.example.wyrmprint.data.remote.pager.ThumbnailDataSourceFactory
+import com.example.wyrmprint.data.remote.pager.ThumbnailBoundaryCallback
 import dagger.Reusable
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -11,47 +14,34 @@ import javax.inject.Inject
 @Reusable
 class ComicRepository @Inject constructor(
     private var dragaliaApi: DragaliaLifeApi,
-    private var compositeDisposable: CompositeDisposable
+    private var compositeDisposable: CompositeDisposable,
+    private var thumbnailDao: ThumbnailDao
 ) {
-    private var onLoadThumbnailInitial = {}
-    private var onLoadThumbnailAfter = {}
 
     fun getComicDetail(comicId: Int) = dragaliaApi.fetchComicStripDetails(comicId)
 
-    fun getThumbnailPageDataSource() =
-        ThumbnailDataSourceFactory(dragaliaApi, compositeDisposable).apply {
-            dataSourceListener = object : DataSourceCallback() {
-                override fun onLoadAfter() {
-                    onLoadThumbnailAfter()
-                }
-
-                override fun onLoadInitial() {
-                    onLoadThumbnailInitial()
-                }
-            }
-        }.toLiveData(
-            pageSize = 2
+    /**
+     * Return a live data PagedList<ThumbnailData> object.
+     */
+    fun getThumbnailDataSourceFactory(): LiveData<PagedList<ThumbnailData>> {
+        val callBack = ThumbnailBoundaryCallback(
+            dragaliaApi,
+            compositeDisposable,
+            thumbnailDao
         )
 
-    /**
-     * Set a function call back when the thumbnail data source has finished loading the  initial data.
-     *
-     * @see getThumbnailPageDataSource
-     * @see ThumbnailDataSourceFactory
-     * @param action the function callback.
-     */
-    fun setThumbnailLoadedInitialCallback(action: () -> Unit) {
-        onLoadThumbnailInitial = action
+        return thumbnailDao.getThumbnailPages().toLiveData(
+            config = PagedList.Config.Builder()
+                .setPageSize(2)
+                .setEnablePlaceholders(false).build(),
+            boundaryCallback = callBack
+        )
     }
 
     /**
-     * Set a function call back when the thumbnail data source has finished loading the after data.
-     *
-     * @see getThumbnailPageDataSource
-     * @see ThumbnailDataSourceFactory
-     * @param action the function callback.
+     * Delete the records in the thumbnail_data table.
      */
-    fun setThumbnailLoadedAfterCallback(action: () -> Unit) {
-        onLoadThumbnailAfter = action
+    suspend fun initRefresh() {
+        thumbnailDao.deleteAll()
     }
 }

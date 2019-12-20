@@ -9,8 +9,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
 
-
-
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -28,7 +26,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    dataBinding{
+    dataBinding {
         enabled = true
     }
     compileOptions {
@@ -51,10 +49,11 @@ dependencies {
     def dagger2_ver = "2.25.2"
     def appcompat_ver = "1.1.0"
     def lifecycle_ver = "2.1.0"
+    def room_version = "2.2.2"
 
     // Project Generated
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:$appcompat_ver"
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
@@ -77,7 +76,8 @@ dependencies {
     // Dagger2
     implementation "com.google.dagger:dagger:$dagger2_ver"
     implementation "com.google.dagger:dagger-android:$dagger2_ver"
-    implementation "com.google.dagger:dagger-android-support:$dagger2_ver" // if you use the support libraries
+    implementation "com.google.dagger:dagger-android-support:$dagger2_ver"
+    // if you use the support libraries
     kapt "com.google.dagger:dagger-compiler:$dagger2_ver"
     kapt "com.google.dagger:dagger-android-processor:$dagger2_ver"
 
@@ -100,17 +100,25 @@ dependencies {
 
     // Custom PhotoView
     implementation 'com.github.arsonistant:PhotoView:62f96ad'
+    //implementation 'com.github.arsonistant:FastAdapter:2f32529'
 
     // Coil
     implementation "io.coil-kt:coil:0.8.0"
 
     // Fast Adapter
-    implementation "com.mikepenz:fastadapter:4.1.1"
-    implementation "com.mikepenz:fastadapter-extensions-paged:4.1.1"
-    implementation "com.mikepenz:fastadapter-extensions-scroll:4.1.1"
-    implementation "com.mikepenz:fastadapter-extensions-ui:4.1.1"
-    implementation "com.mikepenz:fastadapter-extensions-utils:4.1.1"
+    implementation "com.mikepenz:fastadapter:v4.1.2-rc01"
+    implementation "com.mikepenz:fastadapter-extensions-paged:v4.1.2-rc01"
+    implementation "com.mikepenz:fastadapter-extensions-scroll:v4.1.2-rc01"
+    implementation "com.mikepenz:fastadapter-extensions-ui:v4.1.2-rc01"
+    implementation "com.mikepenz:fastadapter-extensions-utils:v4.1.2-rc01"
 
     // System UI Helper
     implementation 'me.zhanghai.android.systemuihelper:library:1.0.0'
+
+
+    // Room Persistence Library
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
 }

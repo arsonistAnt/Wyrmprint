@@ -42,24 +42,6 @@ class ComicImageScaleUtil {
 
             return ZoomFactors(minScaleFactor, mediumScaleFactor, maxScaleFactor)
         }
-
-        /**
-         * Set the [Matrix.MSCALE_X] to the [ZoomFactors.minimum] value.
-         *
-         * @param view the [PhotoView] view
-         * @param newZoomFactor [ZoomFactors] to help set the support matrix of the [PhotoView]
-         */
-        fun setSupportMatrixScaleX(view: PhotoView, newZoomFactor: ZoomFactors) {
-            // Get the support matrix.
-            val tempMatrix = Matrix()
-            view.getSuppMatrix(tempMatrix)
-
-            // Get the scale values.
-            val tempValues = FloatArray(9)
-            tempMatrix.getValues(tempValues)
-            val yScale = tempValues[Matrix.MSCALE_Y]
-            tempMatrix.postScale(newZoomFactor.minimum, yScale)
-        }
     }
 }
 
