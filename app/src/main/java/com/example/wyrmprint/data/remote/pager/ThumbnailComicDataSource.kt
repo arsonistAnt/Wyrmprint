@@ -1,12 +1,15 @@
 package com.example.wyrmprint.data.remote.pager
 
+import androidx.annotation.MainThread
 import androidx.paging.PageKeyedDataSource
-import com.example.wyrmprint.data.model.ComicThumbnailData
+import com.example.wyrmprint.data.database.ThumbnailDao
+import com.example.wyrmprint.data.model.ThumbnailData
+import com.example.wyrmprint.data.model.toThumbnailData
 import com.example.wyrmprint.data.remote.DragaliaLifeApi
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -15,58 +18,56 @@ import javax.inject.Inject
  */
 class ThumbnailComicDataSource @Inject constructor(
     private val dragaliaApi: DragaliaLifeApi,
-    private val disposables: CompositeDisposable
-) : PageKeyedDataSource<Int, ComicThumbnailData>() {
+    private val disposables: CompositeDisposable,
+    private val thumbnailDao: ThumbnailDao
+) : PageKeyedDataSource<Int, ThumbnailData>() {
     // Track current page on api.
     private var currentPageNum = 0
     // A listener for the data source
     private var mListener: DataSourceCallback? = null
+    // Maximum number of pages for the thumbnail data.
+    private var MAX_PAGES = 9
 
+    @MainThread
     override fun loadInitial(
         params: LoadInitialParams<Int>,
-        callback: LoadInitialCallback<Int, ComicThumbnailData>
+        callback: LoadInitialCallback<Int, ThumbnailData>
     ) {
-        // Fetch the thumbnail page.
-        dragaliaApi.fetchComicStripPage(currentPageNum)
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnError { e -> Timber.e(e) }
-            .subscribe { thumbnailList ->
-                callback.onResult(thumbnailList, null, currentPageNum + 1)
-                incrementPageNumSync()
-                mListener?.onLoadInitial()
-            }.addTo(disposables)
+        // Create the callback for the initial load.
+        val initialLoadCallback = { thumbnailList: List<ThumbnailData> ->
+            callback.onResult(
+                thumbnailList,
+                null,
+                currentPageNum + 1
+            )
+        }
+        // Load initial data.
+        loadData(currentPageNum, initialLoadCallback)
+        mListener?.onLoadInitial()
     }
 
+    @MainThread
     override fun loadAfter(
         params: LoadParams<Int>,
-        callback: LoadCallback<Int, ComicThumbnailData>
+        callback: LoadCallback<Int, ThumbnailData>
     ) {
         // The current thumbnail page number to load.
         val pageNumToLoad = params.key
-        // Fetch the thumbnail page.
-        dragaliaApi.fetchComicStripPage(pageNumToLoad)
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnError { e -> Timber.e(e) }
-            .subscribeBy( // onError, onComplete, onSuccess
-                { error ->
-                    Timber.e(error)
-                },
-                {
-                    // Still apply callback after unsuccessful call.
-                    mListener?.onLoadAfter()
-                },
-                { thumbnailList ->
-                    callback.onResult(thumbnailList, pageNumToLoad + 1)
-                    incrementPageNumSync()
-                    mListener?.onLoadAfter()
-                }
-            )
-            .addTo(disposables)
+        // Check if pageNumToLoad is greater than the maximum amount of pages.
+        if (pageNumToLoad <= MAX_PAGES) {
+            val loadCallback = { thumbnailList: List<ThumbnailData> ->
+                callback.onResult(thumbnailList, pageNumToLoad + 1)
+            }
+            // Load thumbnail data for the current page number.
+            loadData(pageNumToLoad, loadCallback)
+        } else {
+            mListener?.onLoadAfter()
+        }
     }
 
     override fun loadBefore(
         params: LoadParams<Int>,
-        callback: LoadCallback<Int, ComicThumbnailData>
+        callback: LoadCallback<Int, ThumbnailData>
     ) {
     }
 
@@ -92,4 +93,50 @@ class ThumbnailComicDataSource @Inject constructor(
     fun setDataSourceListener(listener: DataSourceCallback?) {
         mListener = listener
     }
+
+    /**
+     * Handles loading data either from cache or from the API itself. This function will insert
+     * the data fetched from the API into the cache if it's not in the database already.
+     *
+     * @param pageNum indicates which set of thumbnail data to fetch.
+     * @param loadCallback a callback that execute the load callbacks from the data source functions.
+     *
+     * @see loadInitial
+     * @see loadAfter
+     */
+    private fun loadData(pageNum: Int, loadCallback: (thumbnailList: List<ThumbnailData>) -> Unit) {
+        // Fetch the cached thumbnail list.
+        val cacheSource = thumbnailDao.getThumbnailPage(pageNum).doOnError { Timber.e(it) }
+        // Check if cached list is empty, if it is then fetch source list from API.
+        cacheSource.observeOn(AndroidSchedulers.mainThread())
+            .flatMap { cachedList ->
+                if (cachedList.isEmpty()) fetchThumbnailPage(pageNum)
+                else Single.just(cachedList)
+            }
+            .subscribe(
+                { thumbnailList ->
+                    loadCallback(thumbnailList)
+                    incrementPageNumSync()
+
+                }, {
+                    Timber.e(it)
+                }).addTo(disposables)
+    }
+
+    /**
+     * Return an Observable that fetches the thumbnail page data and stores it into the cache database.
+     *
+     * @param pageNum the page number to fetch the thumbnail data from.
+     *
+     * @return an Observable that handles caching and fetching thumbnail page data.
+     */
+    private fun fetchThumbnailPage(pageNum: Int) = dragaliaApi.fetchComicStripPage(pageNum)
+        .doOnError { Timber.e(it) }
+        .map {
+            val sourceList = it.toThumbnailData(pageNum)
+            thumbnailDao.insertThumbnailData(sourceList)
+            sourceList
+        }
+
+
 }

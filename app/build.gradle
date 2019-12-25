@@ -51,6 +51,7 @@ dependencies {
     def dagger2_ver = "2.25.2"
     def appcompat_ver = "1.1.0"
     def lifecycle_ver = "2.1.0"
+    def room_version = "2.2.3"
 
     // Project Generated
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -91,6 +92,10 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ver"
     implementation "androidx.paging:paging-runtime:2.1.0"
     implementation "androidx.paging:paging-runtime-ktx:2.1.0"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
 
     // Android-Iconics
     implementation "com.mikepenz:iconics-core:4.0.2"

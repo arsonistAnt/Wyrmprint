@@ -1,6 +1,7 @@
 package com.example.wyrmprint.data.remote.repository
 
 import androidx.paging.toLiveData
+import com.example.wyrmprint.data.database.ThumbnailDao
 import com.example.wyrmprint.data.remote.DragaliaLifeApi
 import com.example.wyrmprint.data.remote.pager.DataSourceCallback
 import com.example.wyrmprint.data.remote.pager.ThumbnailDataSourceFactory
@@ -11,7 +12,8 @@ import javax.inject.Inject
 @Reusable
 class ComicRepository @Inject constructor(
     private var dragaliaApi: DragaliaLifeApi,
-    private var compositeDisposable: CompositeDisposable
+    private var compositeDisposable: CompositeDisposable,
+    private var thumbnailDao: ThumbnailDao
 ) {
     private var onLoadThumbnailInitial = {}
     private var onLoadThumbnailAfter = {}
@@ -19,7 +21,7 @@ class ComicRepository @Inject constructor(
     fun getComicDetail(comicId: Int) = dragaliaApi.fetchComicStripDetails(comicId)
 
     fun getThumbnailPageDataSource() =
-        ThumbnailDataSourceFactory(dragaliaApi, compositeDisposable).apply {
+        ThumbnailDataSourceFactory(dragaliaApi, compositeDisposable, thumbnailDao).apply {
             dataSourceListener = object : DataSourceCallback() {
                 override fun onLoadAfter() {
                     onLoadThumbnailAfter()

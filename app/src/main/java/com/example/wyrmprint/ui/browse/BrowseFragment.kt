@@ -12,13 +12,13 @@ import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.wyrmprint.data.model.ComicThumbnailData
+import com.example.wyrmprint.data.model.ThumbnailData
+import com.example.wyrmprint.data.model.toThumbnailItemView
 import com.example.wyrmprint.databinding.FragBrowseLayoutBinding
 import com.example.wyrmprint.injection.injector
 import com.example.wyrmprint.injection.viewModel
 import com.example.wyrmprint.ui.browse.viewholder.ThumbnailItemView
 import com.example.wyrmprint.ui.viewmodel.BrowserViewModel
-import com.example.wyrmprint.util.toThumbnailItemView
 import com.mikepenz.fastadapter.GenericFastAdapter
 import com.mikepenz.fastadapter.IAdapter
 import com.mikepenz.fastadapter.IItem
@@ -35,7 +35,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 @ExperimentalPagedSupport
 class BrowseFragment : Fragment() {
     private lateinit var binding: FragBrowseLayoutBinding
-    private lateinit var browsePageItemAdapter: GenericPagedModelAdapter<ComicThumbnailData>
+    private lateinit var browsePageItemAdapter: GenericPagedModelAdapter<ThumbnailData>
     private lateinit var footerItemAdapter: GenericItemAdapter
     private lateinit var fastAdapter: GenericFastAdapter
     private val browserViewModel: BrowserViewModel by viewModel { injector.browserViewModel }
@@ -44,20 +44,22 @@ class BrowseFragment : Fragment() {
     private val SPAN_COUNT_PORTRAIT = 2
     private val SPAN_COUNT_LANDSCAPE = 4
 
+    private var onLastPage = false
+
     companion object {
         // Diff config for the comic thumbnail paged model adapter.
-        val comicThumbnailDiff = AsyncDifferConfig.Builder<ComicThumbnailData>(object :
-            DiffUtil.ItemCallback<ComicThumbnailData>() {
+        val comicThumbnailDiff = AsyncDifferConfig.Builder<ThumbnailData>(object :
+            DiffUtil.ItemCallback<ThumbnailData>() {
             override fun areItemsTheSame(
-                oldItem: ComicThumbnailData,
-                newItem: ComicThumbnailData
+                oldItem: ThumbnailData,
+                newItem: ThumbnailData
             ): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.comicId == newItem.comicId
             }
 
             override fun areContentsTheSame(
-                oldItem: ComicThumbnailData,
-                newItem: ComicThumbnailData
+                oldItem: ThumbnailData,
+                newItem: ThumbnailData
             ): Boolean {
                 return oldItem == newItem
             }
@@ -78,13 +80,19 @@ class BrowseFragment : Fragment() {
         return binding.root
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        footerItemAdapter.clear()
+        reconfigureRecycler(binding.browserRecycler, fastAdapter)
+    }
+
     /**
      * Initialize any objects/views before use.
      */
     private fun initSetup() {
-        browsePageItemAdapter = GenericPagedModelAdapter(comicThumbnailDiff) { comicThumbnail ->
+        browsePageItemAdapter = GenericPagedModelAdapter(comicThumbnailDiff) { thumbnailItem ->
             // Wrap into ThumbnailItemView
-            comicThumbnail.toThumbnailItemView()
+            thumbnailItem.toThumbnailItemView()
         }
         footerItemAdapter = GenericItemAdapter()
         binding.browserViewModel = browserViewModel
@@ -106,7 +114,7 @@ class BrowseFragment : Fragment() {
             )
         ).apply {
             registerTypeInstance(ThumbnailItemView(null))
-            onClickListener = { view, adapter, item, position ->
+            onClickListener = { _, _, item, _ ->
                 (item as ThumbnailItemView).thumbnailData?.apply {
                     val action = BrowseFragmentDirections.actionBrowseFragmentToComicPagerActivity(
                         comicUrl,
@@ -129,9 +137,14 @@ class BrowseFragment : Fragment() {
             addOnScrollListener(object : EndlessRecyclerOnScrollListener(footerItemAdapter) {
                 override fun onLoadMore(currentPage: Int) {
                     footerItemAdapter.clear()
-                    footerItemAdapter.add(ProgressItem())
+                    if (!onLastPage)
+                        footerItemAdapter.add(ProgressItem())
                 }
             })
+        }
+        browser.post {
+            requireActivity().browser_progressBar.visibility = View.GONE
+            footerItemAdapter.clear()
         }
     }
 
@@ -147,6 +160,12 @@ class BrowseFragment : Fragment() {
                 Observer { thumbnailPagedList ->
                     browsePageItemAdapter.submitList(thumbnailPagedList)
                 })
+            loadedLastPage.observe(viewLifecycleOwner, Observer {
+                if (it) {
+                    onLastPage = it
+                    footerItemAdapter.clear()
+                }
+            })
         }
     }
 
@@ -154,20 +173,18 @@ class BrowseFragment : Fragment() {
      * Set data source callback functions.
      */
     private fun setDataSourceCallbacks() {
-        browserViewModel.setOnInitialLoadedThumbnail {
-            requireActivity().browser_progressBar.visibility = View.GONE
-        }
         browserViewModel.setOnLoadedMoreThumbnail {
-            footerItemAdapter.clear()
+            browserViewModel.onLastPageLoaded()
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        footerItemAdapter.clear()
-        reconfigRecycler(binding.browserRecycler, fastAdapter)
-    }
-
+    /**
+     * Return the appropriate [GridLayoutManager] for the fast adapter passed in the function.
+     *
+     * @param fastAdapter the [GenericFastAdapter] that will help configure the GridLayoutManager.
+     *
+     * @return the [GridLayoutManager] object configured for the [fastAdapter]
+     */
     private fun getGridLayoutManager(fastAdapter: GenericFastAdapter): GridLayoutManager {
         val currentSpanCount = when (resources.configuration.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> SPAN_COUNT_LANDSCAPE
@@ -177,7 +194,7 @@ class BrowseFragment : Fragment() {
             spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     if (fastAdapter.getItemViewType(position) == ProgressItem().type)
-                        return 2
+                        return currentSpanCount
                     return 1
                 }
             }
@@ -189,7 +206,7 @@ class BrowseFragment : Fragment() {
      *
      * @see onConfigurationChanged
      */
-    private fun reconfigRecycler(
+    private fun reconfigureRecycler(
         recycler: RecyclerView,
         fastAdapter: GenericFastAdapter
     ) {

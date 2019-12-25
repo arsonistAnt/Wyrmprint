@@ -1,9 +1,10 @@
 package com.example.wyrmprint.data.remote
 
 import com.example.wyrmprint.data.local.ComicStrip
-import com.example.wyrmprint.data.model.ComicThumbnailData
+import com.example.wyrmprint.data.model.ThumbnailJson
 import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,7 +34,7 @@ class DragaliaLifeApi @Inject constructor(private var service: DragaliaLifeServi
      * @param pageNum the page number of the thumbnail items.
      * @return [Maybe] that emits list of Thumbnail items.
      */
-    fun fetchComicStripPage(pageNum: Int): Maybe<List<ComicThumbnailData>> =
+    fun fetchComicStripPage(pageNum: Int): Single<List<ThumbnailJson>> =
         service.thumbnailPage(pageNum)
             .subscribeOn(Schedulers.io())
 }
