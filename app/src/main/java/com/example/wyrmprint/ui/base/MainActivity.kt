@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.findNavController
+import androidx.navigation.ui.NavigationUI
 import com.example.wyrmprint.R
 import com.example.wyrmprint.databinding.ActivityMainBinding
 import com.example.wyrmprint.injection.InjectionProvider
@@ -32,7 +34,7 @@ class MainActivity : AppCompatActivity(), InjectionProvider {
         timberSetup()
         permissionsCheck()
         bindingCreate()
-        addBottomNavIcons(mainBinding.mainNavbarBottom.menu)
+        setupBottomNavView()
     }
 
     /**
@@ -61,19 +63,29 @@ class MainActivity : AppCompatActivity(), InjectionProvider {
     }
 
     /**
+     * Configure bottom navigation view.
+     */
+    private fun setupBottomNavView() {
+        val navController = findNavController(R.id.fragment_nav_component)
+        addBottomNavIcons(mainBinding.mainNavbarBottom.menu)
+        NavigationUI.setupWithNavController(mainBinding.mainNavbarBottom, navController)
+    }
+
+    /**
      * Setup menu item icons for the main bottom navigation view.
      *
      * @param menu the [Menu] object of the main bottom navigation view.
+     * @see setupBottomNavView
      */
     private fun addBottomNavIcons(menu: Menu?) =
         menu?.apply {
-            val browseItem = findItem(R.id.item_browse)
-            val recentItem = findItem(R.id.item_recent)
+            val browseItem = findItem(R.id.browseFragment)
+            val favoriteItem = findItem(R.id.favoriteFragment)
             val settingItem = findItem(R.id.item_setting)
             browseItem.icon = IconicsDrawable(applicationContext)
                 .icon(CommunityMaterial.Icon.cmd_grid)
-            recentItem.icon = IconicsDrawable(applicationContext)
-                .icon(CommunityMaterial.Icon2.cmd_update)
+            favoriteItem.icon = IconicsDrawable(applicationContext)
+                .icon(CommunityMaterial.Icon2.cmd_heart)
             settingItem.icon = IconicsDrawable(applicationContext)
                 .icon(CommunityMaterial.Icon.cmd_account_settings)
         }

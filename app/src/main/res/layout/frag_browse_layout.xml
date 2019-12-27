@@ -5,7 +5,7 @@
 
         <variable
             name="browserViewModel"
-            type="com.example.wyrmprint.ui.viewmodel.BrowserViewModel" />
+            type="com.example.wyrmprint.ui.viewmodels.BrowserViewModel" />
     </data>
 
     <LinearLayout

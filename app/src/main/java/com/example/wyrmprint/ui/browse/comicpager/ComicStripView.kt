@@ -1,4 +1,4 @@
-package com.example.wyrmprint.ui.comicpager
+package com.example.wyrmprint.ui.browse.comicpager
 
 import android.app.Activity
 import android.content.Context

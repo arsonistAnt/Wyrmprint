@@ -1,11 +1,11 @@
-package com.example.wyrmprint.ui.viewmodel
+package com.example.wyrmprint.ui.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
+import com.example.wyrmprint.data.database.repository.ComicRepository
 import com.example.wyrmprint.data.model.ThumbnailData
-import com.example.wyrmprint.data.remote.repository.ComicRepository
 import javax.inject.Inject
 
 class BrowserViewModel @Inject constructor(private val comicRepo: ComicRepository) : ViewModel() {

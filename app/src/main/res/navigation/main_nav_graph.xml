@@ -27,4 +27,8 @@
             android:name="comic_id"
             app:argType="integer" />
     </activity>
+    <fragment
+        android:id="@+id/favoriteFragment"
+        android:name="com.example.wyrmprint.ui.favorite.FavoriteFragment"
+        android:label="FavoriteFragment" />
 </navigation>

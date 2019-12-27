@@ -18,7 +18,7 @@ import com.example.wyrmprint.databinding.FragBrowseLayoutBinding
 import com.example.wyrmprint.injection.injector
 import com.example.wyrmprint.injection.viewModel
 import com.example.wyrmprint.ui.browse.viewholder.ThumbnailItemView
-import com.example.wyrmprint.ui.viewmodel.BrowserViewModel
+import com.example.wyrmprint.ui.viewmodels.BrowserViewModel
 import com.mikepenz.fastadapter.GenericFastAdapter
 import com.mikepenz.fastadapter.IAdapter
 import com.mikepenz.fastadapter.IItem
@@ -74,7 +74,6 @@ class BrowseFragment : Fragment() {
         // Init any objects or inflate views for usage.
         binding = FragBrowseLayoutBinding.inflate(layoutInflater, container, false)
         initSetup()
-
         // Initialize the recycler view.
         initBrowserRecyclerView(binding.browserRecycler)
         return binding.root

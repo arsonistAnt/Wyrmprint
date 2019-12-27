@@ -1,4 +1,4 @@
-package com.example.wyrmprint.data.remote.repository
+package com.example.wyrmprint.data.database.repository
 
 import androidx.paging.toLiveData
 import com.example.wyrmprint.data.database.ThumbnailDao

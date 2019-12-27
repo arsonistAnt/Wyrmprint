@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/back_drop">
 
-        <com.example.wyrmprint.ui.comicpager.ComicStripView
+        <com.example.wyrmprint.ui.browse.comicpager.ComicStripView
             android:id="@+id/comic_strip"
             app:customScaleType="autoScaleWidth"
             android:layout_width="match_parent"

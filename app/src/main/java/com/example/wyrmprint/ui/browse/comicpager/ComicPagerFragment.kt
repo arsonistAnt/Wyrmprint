@@ -1,4 +1,4 @@
-package com.example.wyrmprint.ui.comicpager
+package com.example.wyrmprint.ui.browse.comicpager
 
 import android.app.Activity
 import android.content.res.Configuration
@@ -16,7 +16,7 @@ import com.example.wyrmprint.injection.injector
 import com.example.wyrmprint.injection.viewModel
 import com.example.wyrmprint.ui.base.MainReaderActivity
 import com.example.wyrmprint.ui.base.MainReaderActivityArgs
-import com.example.wyrmprint.ui.viewmodel.ComicPagerViewModel
+import com.example.wyrmprint.ui.viewmodels.ComicPagerViewModel
 import com.github.chrisbanes.photoview.PhotoView
 import me.zhanghai.android.systemuihelper.SystemUiHelper
 

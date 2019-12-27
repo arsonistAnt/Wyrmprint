@@ -1,4 +1,4 @@
-package com.example.wyrmprint.ui.viewmodel
+package com.example.wyrmprint.ui.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
