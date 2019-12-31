@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!--    Main Navigation Items-->
     <string name="app_name">Wyrmprint</string>
     <string name="item_browse_string">Browse</string>
@@ -9,5 +9,5 @@
     <string name="thumbnail_title_place_holder">Title_Place_Holder</string>
     <string name="thumbnail_chapter_number">number</string>
     <string name="thumbnail_num_pound">#</string>
-    <string name="no_comic_strips_has_been_added_to_favorites">No comic strips has been added to favorites...</string>
+    <string name="no_favorites_message" tools:ignore="TypographyEllipsis">No comic strips have been added to the favorites list...</string>
 </resources>
