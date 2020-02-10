@@ -17,11 +17,13 @@ class ThumbnailDataSourceFactory @Inject constructor(
 ) : DataSource.Factory<Int, ThumbnailData>() {
 
     var dataSourceListener: DataSourceCallback? = null
+    lateinit var mainDataSource : DataSource<Int, ThumbnailData>
 
     override fun create(): DataSource<Int, ThumbnailData> {
-        return ThumbnailComicDataSource(dragaliaApi, disposables, thumbnailDao).apply {
+        mainDataSource = ThumbnailComicDataSource(dragaliaApi, disposables, thumbnailDao).apply {
             setDataSourceListener(dataSourceListener)
         }
+        return mainDataSource
     }
 }
 

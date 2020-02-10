@@ -95,8 +95,35 @@ class BrowseFragment : Fragment() {
         }
         footerItemAdapter = GenericItemAdapter()
         binding.browserViewModel = browserViewModel
+        binding.browseSwipeRefresh.setOnRefreshListener {
+            browserViewModel.invalidateThumbnailData()
+        }
+        // Callback for when the initial data is finished loading or when refresh-data has finished.
+        browserViewModel.setOnInitialLoadedThumbnail {
+            binding.browseSwipeRefresh.isRefreshing = false
+            requireActivity().browser_progressBar.visibility = View.GONE
+        }
         initObservables(browserViewModel)
         setDataSourceCallbacks()
+    }
+
+    private fun createFastAdapter() = GenericFastAdapter.with<IItem<*>, IAdapter<IItem<*>>>(
+        listOf(
+            browsePageItemAdapter,
+            footerItemAdapter
+        )
+    ).apply {
+        registerTypeInstance(ThumbnailItemView(null))
+        onClickListener = { _, _, item, _ ->
+            (item as ThumbnailItemView).thumbnailData?.apply {
+                val action = BrowseFragmentDirections.actionBrowseFragmentToComicPagerActivity(
+                    comicUrl,
+                    id
+                )
+                findNavController().navigate(action)
+            }
+            false
+        }
     }
 
     /**
@@ -106,24 +133,7 @@ class BrowseFragment : Fragment() {
      */
     private fun initBrowserRecyclerView(browser: RecyclerView) {
         // Create a generic fast adapter that will take in a paged model adapter and a generic item adapter.
-        fastAdapter = GenericFastAdapter.with<IItem<*>, IAdapter<IItem<*>>>(
-            listOf(
-                browsePageItemAdapter,
-                footerItemAdapter
-            )
-        ).apply {
-            registerTypeInstance(ThumbnailItemView(null))
-            onClickListener = { _, _, item, _ ->
-                (item as ThumbnailItemView).thumbnailData?.apply {
-                    val action = BrowseFragmentDirections.actionBrowseFragmentToComicPagerActivity(
-                        comicUrl,
-                        id
-                    )
-                    findNavController().navigate(action)
-                }
-                false
-            }
-        }
+        fastAdapter = createFastAdapter()
 
         // Init grid layout manager & set span size lookup for ProgressItem.
         val gridLayoutManager = getGridLayoutManager(fastAdapter)
@@ -141,10 +151,6 @@ class BrowseFragment : Fragment() {
                 }
             })
         }
-        browser.post {
-            requireActivity().browser_progressBar.visibility = View.GONE
-            footerItemAdapter.clear()
-        }
     }
 
     /**
@@ -157,7 +163,18 @@ class BrowseFragment : Fragment() {
             thumbnailDataItemPageList.observe(
                 viewLifecycleOwner,
                 Observer { thumbnailPagedList ->
-                    browsePageItemAdapter.submitList(thumbnailPagedList)
+                    if (binding.browseSwipeRefresh.isRefreshing) {
+                        // Re-create the adapter to properly refresh data.
+                        browsePageItemAdapter.submitList(thumbnailPagedList, Runnable {
+                            footerItemAdapter.clear()
+                            fastAdapter = createFastAdapter()
+                            binding.browserRecycler.apply {
+                                adapter = fastAdapter
+                                layoutManager = getGridLayoutManager(fastAdapter)
+                            }
+                        })
+                    } else
+                        browsePageItemAdapter.submitList(thumbnailPagedList)
                 })
             loadedLastPage.observe(viewLifecycleOwner, Observer {
                 if (it) {

@@ -26,7 +26,7 @@ class ThumbnailComicDataSource @Inject constructor(
     // A listener for the data source
     private var mListener: DataSourceCallback? = null
     // Maximum number of pages for the thumbnail data.
-    private var MAX_PAGES = 9
+    private val MAX_PAGES = 10
 
     @MainThread
     override fun loadInitial(
@@ -35,15 +35,15 @@ class ThumbnailComicDataSource @Inject constructor(
     ) {
         // Create the callback for the initial load.
         val initialLoadCallback = { thumbnailList: List<ThumbnailData> ->
+            mListener?.onLoadInitial()
             callback.onResult(
                 thumbnailList,
                 null,
                 currentPageNum + 1
             )
         }
-        // Load initial data.
+        // Load the initial data via Room or API request.
         loadData(currentPageNum, initialLoadCallback)
-        mListener?.onLoadInitial()
     }
 
     @MainThread
@@ -72,8 +72,10 @@ class ThumbnailComicDataSource @Inject constructor(
     }
 
     override fun invalidate() {
-        super.invalidate()
+        thumbnailDao.clearThumbnailData()
+        currentPageNum = 0
         disposables.clear()
+        super.invalidate()
     }
 
 

@@ -18,9 +18,8 @@ class ComicRepository @Inject constructor(
     private var onLoadThumbnailInitial = {}
     private var onLoadThumbnailAfter = {}
 
-    fun getComicDetail(comicId: Int) = dragaliaApi.fetchComicStripDetails(comicId)
-
-    fun getThumbnailPageDataSource() =
+    // Thumbnail data source factory.
+    private val thumbnailDataSourceFactory by lazy {
         ThumbnailDataSourceFactory(dragaliaApi, compositeDisposable, thumbnailDao).apply {
             dataSourceListener = object : DataSourceCallback() {
                 override fun onLoadAfter() {
@@ -31,7 +30,13 @@ class ComicRepository @Inject constructor(
                     onLoadThumbnailInitial()
                 }
             }
-        }.toLiveData(
+        }
+    }
+
+    fun getComicDetail(comicId: Int) = dragaliaApi.fetchComicStripDetails(comicId)
+
+    fun getThumbnailPageDataSource() =
+        thumbnailDataSourceFactory.toLiveData(
             pageSize = 2
         )
 
@@ -55,5 +60,12 @@ class ComicRepository @Inject constructor(
      */
     fun setThumbnailLoadedAfterCallback(action: () -> Unit) {
         onLoadThumbnailAfter = action
+    }
+
+    /**
+     * Invalidate paged list data and clear thumbnail cache in room, allowing to re-cache and update new data into the database.
+     */
+    fun invalidateThumbnailData(){
+        thumbnailDataSourceFactory.mainDataSource.invalidate()
     }
 }

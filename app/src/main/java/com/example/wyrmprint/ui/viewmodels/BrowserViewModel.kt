@@ -3,14 +3,18 @@ package com.example.wyrmprint.ui.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagedList
 import com.example.wyrmprint.data.database.repository.ComicRepository
 import com.example.wyrmprint.data.model.ThumbnailData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class BrowserViewModel @Inject constructor(private val comicRepo: ComicRepository) : ViewModel() {
     // PagedList to load thumbnail comic items.
-    private val _thumbnailPageList = comicRepo.getThumbnailPageDataSource()
+    private var _thumbnailPageList = comicRepo.getThumbnailPageDataSource()
     val thumbnailDataItemPageList: LiveData<PagedList<ThumbnailData>>
         get() = _thumbnailPageList
 
@@ -18,6 +22,15 @@ class BrowserViewModel @Inject constructor(private val comicRepo: ComicRepositor
     private val _loadedLastPage = MutableLiveData<Boolean>(false)
     val loadedLastPage: LiveData<Boolean>
         get() = _loadedLastPage
+
+
+    fun invalidateThumbnailData(){
+        runBlocking {
+            viewModelScope.launch(Dispatchers.IO){
+                comicRepo.invalidateThumbnailData()
+            }
+        }
+    }
 
     /**
      * Set the function callback for when the initial thumbnail data has finished loading.

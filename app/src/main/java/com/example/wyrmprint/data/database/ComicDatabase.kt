@@ -11,6 +11,9 @@ interface ThumbnailDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertThumbnailData(thumbnailData: List<ThumbnailData>)
+
+    @Query("DELETE FROM thumbnail_data")
+    fun clearThumbnailData()
 }
 
 @Database(entities = [ThumbnailData::class], version = 1)
