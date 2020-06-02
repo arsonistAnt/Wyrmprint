@@ -21,12 +21,9 @@ class ThumbnailComicDataSource @Inject constructor(
     private val disposables: CompositeDisposable,
     private val thumbnailDao: ThumbnailDao
 ) : PageKeyedDataSource<Int, ThumbnailData>() {
-    // Track current page on api.
-    private var currentPageNum = 0
     // A listener for the data source
     private var mListener: DataSourceCallback? = null
-    // Maximum number of pages for the thumbnail data.
-    private val MAX_PAGES = 10
+
 
     @MainThread
     override fun loadInitial(
@@ -39,11 +36,11 @@ class ThumbnailComicDataSource @Inject constructor(
             callback.onResult(
                 thumbnailList,
                 null,
-                currentPageNum + 1
+                0
             )
         }
         // Load the initial data via Room or API request.
-        loadData(currentPageNum, initialLoadCallback)
+        loadData(0, initialLoadCallback)
     }
 
     @MainThread
@@ -52,17 +49,13 @@ class ThumbnailComicDataSource @Inject constructor(
         callback: LoadCallback<Int, ThumbnailData>
     ) {
         // The current thumbnail page number to load.
-        val pageNumToLoad = params.key
-        // Check if pageNumToLoad is greater than the maximum amount of pages.
-        if (pageNumToLoad <= MAX_PAGES) {
-            val loadCallback = { thumbnailList: List<ThumbnailData> ->
-                callback.onResult(thumbnailList, pageNumToLoad + 1)
-            }
-            // Load thumbnail data for the current page number.
-            loadData(pageNumToLoad, loadCallback)
-        } else {
-            mListener?.onLoadAfter()
+        val pageNumToLoad = params.key + 1
+
+        val loadCallback = { thumbnailList: List<ThumbnailData> ->
+            callback.onResult(thumbnailList, pageNumToLoad)
         }
+        // Load thumbnail data for the current page number.
+        loadData(pageNumToLoad, loadCallback)
     }
 
     override fun loadBefore(
@@ -73,19 +66,10 @@ class ThumbnailComicDataSource @Inject constructor(
 
     override fun invalidate() {
         thumbnailDao.clearThumbnailData()
-        currentPageNum = 0
         disposables.clear()
         super.invalidate()
     }
 
-
-    /**
-     * Increment [currentPageNum] synchronously.
-     */
-    @Synchronized
-    private fun incrementPageNumSync() {
-        currentPageNum++
-    }
 
     /**
      * Sets the current [mListener] for this class.
@@ -118,8 +102,6 @@ class ThumbnailComicDataSource @Inject constructor(
             .subscribe(
                 { thumbnailList ->
                     loadCallback(thumbnailList)
-                    incrementPageNumSync()
-
                 }, {
                     Timber.e(it)
                 }).addTo(disposables)
