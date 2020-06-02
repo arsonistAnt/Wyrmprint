@@ -44,8 +44,6 @@ class BrowseFragment : Fragment() {
     private val SPAN_COUNT_PORTRAIT = 2
     private val SPAN_COUNT_LANDSCAPE = 4
 
-    private var onLastPage = false
-
     companion object {
         // Diff config for the comic thumbnail paged model adapter.
         val comicThumbnailDiff = AsyncDifferConfig.Builder<ThumbnailData>(object :
@@ -104,7 +102,6 @@ class BrowseFragment : Fragment() {
             requireActivity().browser_progressBar.visibility = View.GONE
         }
         initObservables(browserViewModel)
-        setDataSourceCallbacks()
     }
 
     private fun createFastAdapter() = GenericFastAdapter.with<IItem<*>, IAdapter<IItem<*>>>(
@@ -143,13 +140,6 @@ class BrowseFragment : Fragment() {
             layoutManager = gridLayoutManager
             // Config adapter
             adapter = fastAdapter
-            addOnScrollListener(object : EndlessRecyclerOnScrollListener(footerItemAdapter) {
-                override fun onLoadMore(currentPage: Int) {
-                    footerItemAdapter.clear()
-                    if (!onLastPage)
-                        footerItemAdapter.add(ProgressItem())
-                }
-            })
         }
     }
 
@@ -176,21 +166,6 @@ class BrowseFragment : Fragment() {
                     } else
                         browsePageItemAdapter.submitList(thumbnailPagedList)
                 })
-            loadedLastPage.observe(viewLifecycleOwner, Observer {
-                if (it) {
-                    onLastPage = it
-                    footerItemAdapter.clear()
-                }
-            })
-        }
-    }
-
-    /**
-     * Set data source callback functions.
-     */
-    private fun setDataSourceCallbacks() {
-        browserViewModel.setOnLoadedMoreThumbnail {
-            browserViewModel.onLastPageLoaded()
         }
     }
 
