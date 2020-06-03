@@ -20,8 +20,10 @@ import com.example.wyrmprint.data.model.toThumbnailItemView
 import com.example.wyrmprint.databinding.FragBrowseLayoutBinding
 import com.example.wyrmprint.injection.injector
 import com.example.wyrmprint.injection.viewModel
+import com.example.wyrmprint.ui.browse.viewholder.RetryItemView
 import com.example.wyrmprint.ui.browse.viewholder.ThumbnailItemView
 import com.example.wyrmprint.ui.viewmodels.BrowserViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.mikepenz.fastadapter.GenericFastAdapter
 import com.mikepenz.fastadapter.IAdapter
 import com.mikepenz.fastadapter.IItem
@@ -29,6 +31,7 @@ import com.mikepenz.fastadapter.adapters.GenericItemAdapter
 import com.mikepenz.fastadapter.paged.ExperimentalPagedSupport
 import com.mikepenz.fastadapter.paged.GenericPagedModelAdapter
 import com.mikepenz.fastadapter.ui.items.ProgressItem
+import kotlinx.android.synthetic.main.activity_main.*
 
 /**
  * Fragment that hosts the UI for viewing the thumbnail items of the Dragalia Life API.
@@ -44,6 +47,7 @@ class BrowseFragment : Fragment() {
     // Default span count for different orientations.
     private val SPAN_COUNT_PORTRAIT = 2
     private val SPAN_COUNT_LANDSCAPE = 4
+
     // Keep track if user has swiped to refresh.
     private var userSwiped = false
 
@@ -172,7 +176,7 @@ class BrowseFragment : Fragment() {
      */
     private fun handleThumbnailRequest(networkState: NetworkStatus) {
         when {
-            networkState.hasError() -> showSnackBarRetry(networkState)
+            networkState.hasError() -> showRetryButton(networkState)
             networkState.inProgress -> showLoadingProgressUI()
             networkState.success -> onRequestSuccess()
         }
@@ -190,16 +194,29 @@ class BrowseFragment : Fragment() {
             Configuration.ORIENTATION_LANDSCAPE -> SPAN_COUNT_LANDSCAPE
             else -> SPAN_COUNT_PORTRAIT
         }
-        return GridLayoutManager(requireContext(), currentSpanCount).apply {
+        return constructGridLayoutManager(fastAdapter, currentSpanCount)
+    }
+
+    /**
+     * Constructs the grid layout manager.
+     *
+     * @param currentSpanCount the current span count, usually dependent on orientation type and item ViewHolder type.
+     */
+    private fun constructGridLayoutManager(
+        fastAdapter: GenericFastAdapter,
+        currentSpanCount: Int
+    ): GridLayoutManager =
+        GridLayoutManager(requireContext(), currentSpanCount).apply {
+            // Set the span size for the footer items.
             spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                override fun getSpanSize(position: Int): Int {
-                    if (fastAdapter.getItemViewType(position) == ProgressItem().type)
-                        return currentSpanCount
-                    return 1
-                }
+                override fun getSpanSize(position: Int) =
+                    when (fastAdapter.getItemViewType(position)) {
+                        ProgressItem().type -> currentSpanCount
+                        RetryItemView {}.type -> currentSpanCount
+                        else -> 1
+                    }
             }
         }
-    }
 
     /**
      * Reconfigure the RecyclerView on orientation change.
@@ -218,7 +235,7 @@ class BrowseFragment : Fragment() {
      *
      * @param thumbnailPagedList the [PagedList] to submit to the [GenericItemAdapter] for the thumbnail browser.
      */
-    private fun updateThumbnailPagedList(thumbnailPagedList : PagedList<ThumbnailData>){
+    private fun updateThumbnailPagedList(thumbnailPagedList: PagedList<ThumbnailData>) {
         if (binding.browseSwipeRefresh.isRefreshing) {
             // Re-create the adapter to properly refresh data.
             browsePageItemAdapter.submitList(thumbnailPagedList, Runnable {
@@ -240,8 +257,8 @@ class BrowseFragment : Fragment() {
      *
      * This function helps decide which progress bar to show.
      */
-    private fun showLoadingProgressUI(){
-        if(!userSwiped){
+    private fun showLoadingProgressUI() {
+        if (!userSwiped) {
             footerItemAdapter.add(ProgressItem())
         }
     }
@@ -249,20 +266,28 @@ class BrowseFragment : Fragment() {
     /**
      * Cleanup UI or post UI notifications after successful network request.
      */
-    private fun onRequestSuccess(){
+    private fun onRequestSuccess() {
         hideLoadingProgress()
     }
 
     /**
-     * TODO: Create a snackbar to retry network request.
+     * Show retry UI when error occurs in the network.
      *
      * @param networkState the current state of the network request.
      */
-    private fun showSnackBarRetry(networkState : NetworkStatus){
+    private fun showRetryButton(networkState: NetworkStatus) {
         hideLoadingProgress()
+        val errorMessage = networkState.err?.message ?: "An unexpected error has occurred."
+        // Add retry button.
+        footerItemAdapter.add(RetryItemView {
+            browserViewModel.invalidateThumbnailData()
+            footerItemAdapter.clear()
+        })
+
+        // Output error message.
         Toast.makeText(
             requireContext(),
-            networkState.err?.message,
+            errorMessage,
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -270,8 +295,9 @@ class BrowseFragment : Fragment() {
     /**
      * Hide all loading progress bars.
      */
-    private fun hideLoadingProgress(){
+    private fun hideLoadingProgress() {
         binding.browseSwipeRefresh.isRefreshing = false
+        userSwiped = false
         footerItemAdapter.clear()
     }
 }

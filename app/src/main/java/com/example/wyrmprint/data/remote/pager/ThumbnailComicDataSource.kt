@@ -96,9 +96,12 @@ class ThumbnailComicDataSource @Inject constructor(
                 { thumbnailList ->
                     loadCallback(thumbnailList)
                     thumbnailNetworkState.postValue(NetworkStatus.success())
-                }, {
-                    Timber.e(it)
-                    thumbnailNetworkState.postValue(NetworkStatus.failure(it))
+                }, { err ->
+                    if (err is NoSuchElementException)
+                        thumbnailNetworkState.postValue(NetworkStatus.success())
+                    else
+                        thumbnailNetworkState.postValue(NetworkStatus.failure(err))
+                    Timber.e(err)
                 }).addTo(disposables)
     }
 

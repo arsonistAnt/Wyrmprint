@@ -10,4 +10,5 @@
     <string name="thumbnail_chapter_number">number</string>
     <string name="thumbnail_num_pound">#</string>
     <string name="no_favorites_message" tools:ignore="TypographyEllipsis">No comic strips have been added to the favorites list...</string>
+    <string name="retry_item_button_str">Retry</string>
 </resources>
