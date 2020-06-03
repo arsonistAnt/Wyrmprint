@@ -33,11 +33,5 @@
                 app:menu="@menu/main_nav_menu" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-        <ProgressBar
-            android:id="@+id/browser_progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center" />
     </FrameLayout>
 </layout>

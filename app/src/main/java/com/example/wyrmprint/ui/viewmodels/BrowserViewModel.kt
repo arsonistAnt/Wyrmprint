@@ -1,12 +1,12 @@
 package com.example.wyrmprint.ui.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.example.wyrmprint.data.database.repository.ComicRepository
+import com.example.wyrmprint.data.model.NetworkStatus
 import com.example.wyrmprint.data.model.ThumbnailData
+import com.example.wyrmprint.data.remote.pager.ThumbnailComicDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -14,51 +14,35 @@ import javax.inject.Inject
 
 class BrowserViewModel @Inject constructor(private val comicRepo: ComicRepository) : ViewModel() {
     // PagedList to load thumbnail comic items.
-    private var _thumbnailPageList = comicRepo.getThumbnailPageDataSource()
+    private val thumbnailDataSource: MutableLiveData<ThumbnailComicDataSource>
+    private val thumbnailPagedListConfig: PagedList.Config =
+        PagedList.Config.Builder().setEnablePlaceholders(false)
+            .setPrefetchDistance(10)
+            .setPageSize(10)
+            .build()
+    val thumbnailNetworkStatus: LiveData<NetworkStatus>
     val thumbnailDataItemPageList: LiveData<PagedList<ThumbnailData>>
-        get() = _thumbnailPageList
 
-    // Live data to keep track on
-    private val _loadedLastPage = MutableLiveData<Boolean>(false)
-    val loadedLastPage: LiveData<Boolean>
-        get() = _loadedLastPage
+    init {
+        // Create thumbnail data source factory and use the paged list builder to create a paged list.
+        val thumbnailDataSourceFactory = comicRepo.getThumbnailDataSourceFactory()
+        thumbnailDataSource = thumbnailDataSourceFactory.currThumbnailDataSource
+        // Get the thumbnail network state LiveData and assign it to the ViewModel.
+        thumbnailNetworkStatus = Transformations.switchMap(thumbnailDataSource) {
+            it.thumbnailNetworkState
+        }
+        thumbnailDataItemPageList = LivePagedListBuilder(
+            thumbnailDataSourceFactory,
+            thumbnailPagedListConfig
+        ).build()
+    }
 
-
-    fun invalidateThumbnailData(){
-        runBlocking {
-            viewModelScope.launch(Dispatchers.IO){
-                comicRepo.invalidateThumbnailData()
-            }
+    /**
+     * Invalidate the thumbnail data source and start reloading new data.
+     */
+    fun invalidateThumbnailData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            thumbnailDataSource.value?.invalidate()
         }
     }
-
-    /**
-     * Set the function callback for when the initial thumbnail data has finished loading.
-     *
-     * @param action the function callback.
-     */
-    fun setOnInitialLoadedThumbnail(action: () -> Unit) {
-        comicRepo.setThumbnailLoadedInitialCallback(action)
-    }
-
-    /**
-     * Set the function callback for when the after thumbnail data has finished loading.
-     *
-     * @param action the function callback.
-     */
-    fun setOnLoadedMoreThumbnail(action: () -> Unit) {
-        comicRepo.setThumbnailLoadedAfterCallback(action)
-    }
-
-
-    /**
-     * Called when reaching the last page of the paging list.
-     */
-    fun onLastPageLoaded() = run { _loadedLastPage.postValue(true) }
-
-    /**
-     * Called when resetting or adding more to the paging list.
-     */
-    fun resetPageLoadedState() = run { _loadedLastPage.postValue(false) }
-
 }

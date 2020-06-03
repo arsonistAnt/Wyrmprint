@@ -5,13 +5,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wyrmprint.data.model.NetworkStatus
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.toThumbnailItemView
 import com.example.wyrmprint.databinding.FragBrowseLayoutBinding
@@ -25,9 +28,7 @@ import com.mikepenz.fastadapter.IItem
 import com.mikepenz.fastadapter.adapters.GenericItemAdapter
 import com.mikepenz.fastadapter.paged.ExperimentalPagedSupport
 import com.mikepenz.fastadapter.paged.GenericPagedModelAdapter
-import com.mikepenz.fastadapter.scroll.EndlessRecyclerOnScrollListener
 import com.mikepenz.fastadapter.ui.items.ProgressItem
-import kotlinx.android.synthetic.main.activity_main.*
 
 /**
  * Fragment that hosts the UI for viewing the thumbnail items of the Dragalia Life API.
@@ -43,6 +44,8 @@ class BrowseFragment : Fragment() {
     // Default span count for different orientations.
     private val SPAN_COUNT_PORTRAIT = 2
     private val SPAN_COUNT_LANDSCAPE = 4
+    // Keep track if user has swiped to refresh.
+    private var userSwiped = false
 
     companion object {
         // Diff config for the comic thumbnail paged model adapter.
@@ -95,12 +98,9 @@ class BrowseFragment : Fragment() {
         binding.browserViewModel = browserViewModel
         binding.browseSwipeRefresh.setOnRefreshListener {
             browserViewModel.invalidateThumbnailData()
+            userSwiped = true
         }
-        // Callback for when the initial data is finished loading or when refresh-data has finished.
-        browserViewModel.setOnInitialLoadedThumbnail {
-            binding.browseSwipeRefresh.isRefreshing = false
-            requireActivity().browser_progressBar.visibility = View.GONE
-        }
+
         initObservables(browserViewModel)
     }
 
@@ -153,19 +153,28 @@ class BrowseFragment : Fragment() {
             thumbnailDataItemPageList.observe(
                 viewLifecycleOwner,
                 Observer { thumbnailPagedList ->
-                    if (binding.browseSwipeRefresh.isRefreshing) {
-                        // Re-create the adapter to properly refresh data.
-                        browsePageItemAdapter.submitList(thumbnailPagedList, Runnable {
-                            footerItemAdapter.clear()
-                            fastAdapter = createFastAdapter()
-                            binding.browserRecycler.apply {
-                                adapter = fastAdapter
-                                layoutManager = getGridLayoutManager(fastAdapter)
-                            }
-                        })
-                    } else
-                        browsePageItemAdapter.submitList(thumbnailPagedList)
+                    updateThumbnailPagedList(thumbnailPagedList)
                 })
+
+            thumbnailNetworkStatus.observe(
+                viewLifecycleOwner,
+                Observer {
+                    handleThumbnailRequest(it)
+                }
+            )
+        }
+    }
+
+    /**
+     * Respond to the thumbnail request's [NetworkStatus] state with the appropriate UI or debug logging.
+     *
+     * @param networkState the network state.
+     */
+    private fun handleThumbnailRequest(networkState: NetworkStatus) {
+        when {
+            networkState.hasError() -> showSnackBarRetry(networkState)
+            networkState.inProgress -> showLoadingProgressUI()
+            networkState.success -> onRequestSuccess()
         }
     }
 
@@ -202,5 +211,67 @@ class BrowseFragment : Fragment() {
         fastAdapter: GenericFastAdapter
     ) {
         recycler.layoutManager = getGridLayoutManager(fastAdapter)
+    }
+
+    /**
+     * Initialize or update the thumbnail paged list to the UI.
+     *
+     * @param thumbnailPagedList the [PagedList] to submit to the [GenericItemAdapter] for the thumbnail browser.
+     */
+    private fun updateThumbnailPagedList(thumbnailPagedList : PagedList<ThumbnailData>){
+        if (binding.browseSwipeRefresh.isRefreshing) {
+            // Re-create the adapter to properly refresh data.
+            browsePageItemAdapter.submitList(thumbnailPagedList, Runnable {
+                footerItemAdapter.clear()
+                fastAdapter = createFastAdapter()
+                binding.browserRecycler.apply {
+                    adapter = fastAdapter
+                    layoutManager = getGridLayoutManager(fastAdapter)
+                }
+            })
+        } else
+            browsePageItemAdapter.submitList(thumbnailPagedList)
+    }
+
+    /**
+     * Two progress bar needs to be kept in check:
+     *      1. Swipe to refresh.
+     *      2. New data is being loaded into the pagination.
+     *
+     * This function helps decide which progress bar to show.
+     */
+    private fun showLoadingProgressUI(){
+        if(!userSwiped){
+            footerItemAdapter.add(ProgressItem())
+        }
+    }
+
+    /**
+     * Cleanup UI or post UI notifications after successful network request.
+     */
+    private fun onRequestSuccess(){
+        hideLoadingProgress()
+    }
+
+    /**
+     * TODO: Create a snackbar to retry network request.
+     *
+     * @param networkState the current state of the network request.
+     */
+    private fun showSnackBarRetry(networkState : NetworkStatus){
+        hideLoadingProgress()
+        Toast.makeText(
+            requireContext(),
+            networkState.err?.message,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    /**
+     * Hide all loading progress bars.
+     */
+    private fun hideLoadingProgress(){
+        binding.browseSwipeRefresh.isRefreshing = false
+        footerItemAdapter.clear()
     }
 }

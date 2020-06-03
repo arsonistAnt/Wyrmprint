@@ -1,9 +1,13 @@
 package com.example.wyrmprint.data.remote.pager
 
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
 import com.example.wyrmprint.data.database.ThumbnailDao
+import com.example.wyrmprint.data.model.NetworkState
+import com.example.wyrmprint.data.model.NetworkStatus
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.remote.DragaliaLifeApi
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
@@ -16,22 +20,13 @@ class ThumbnailDataSourceFactory @Inject constructor(
     private val thumbnailDao: ThumbnailDao
 ) : DataSource.Factory<Int, ThumbnailData>() {
 
-    var dataSourceListener: DataSourceCallback? = null
-    lateinit var mainDataSource : DataSource<Int, ThumbnailData>
+    // The current thumbnail data source that has been created.
+    var currThumbnailDataSource = MutableLiveData<ThumbnailComicDataSource>()
 
     override fun create(): DataSource<Int, ThumbnailData> {
-        mainDataSource = ThumbnailComicDataSource(dragaliaApi, disposables, thumbnailDao).apply {
-            setDataSourceListener(dataSourceListener)
+        return ThumbnailComicDataSource(dragaliaApi, disposables, thumbnailDao).apply {
+            currThumbnailDataSource.postValue(this)
         }
-        return mainDataSource
     }
-}
-
-/**
- * A data source listener for the [ThumbnailComicDataSource] class.
- */
-abstract class DataSourceCallback {
-    abstract fun onLoadAfter()
-    abstract fun onLoadInitial()
 }
 

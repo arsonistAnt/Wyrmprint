@@ -1,11 +1,15 @@
 package com.example.wyrmprint.data.remote.pager
 
 import androidx.annotation.MainThread
+import androidx.lifecycle.MutableLiveData
 import androidx.paging.PageKeyedDataSource
 import com.example.wyrmprint.data.database.ThumbnailDao
+import com.example.wyrmprint.data.model.NetworkState
+import com.example.wyrmprint.data.model.NetworkStatus
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.toThumbnailData
 import com.example.wyrmprint.data.remote.DragaliaLifeApi
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -21,18 +25,18 @@ class ThumbnailComicDataSource @Inject constructor(
     private val disposables: CompositeDisposable,
     private val thumbnailDao: ThumbnailDao
 ) : PageKeyedDataSource<Int, ThumbnailData>() {
-    // A listener for the data source
-    private var mListener: DataSourceCallback? = null
 
+    // Represents the current state of the thumbnail paging requests.
+    var thumbnailNetworkState = MutableLiveData<NetworkStatus>()
 
     @MainThread
     override fun loadInitial(
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, ThumbnailData>
     ) {
+        thumbnailNetworkState.postValue(NetworkStatus.inProgress())
         // Create the callback for the initial load.
         val initialLoadCallback = { thumbnailList: List<ThumbnailData> ->
-            mListener?.onLoadInitial()
             callback.onResult(
                 thumbnailList,
                 null,
@@ -48,6 +52,7 @@ class ThumbnailComicDataSource @Inject constructor(
         params: LoadParams<Int>,
         callback: LoadCallback<Int, ThumbnailData>
     ) {
+        thumbnailNetworkState.postValue(NetworkStatus.inProgress())
         // The current thumbnail page number to load.
         val pageNumToLoad = params.key + 1
 
@@ -70,16 +75,6 @@ class ThumbnailComicDataSource @Inject constructor(
         super.invalidate()
     }
 
-
-    /**
-     * Sets the current [mListener] for this class.
-     *
-     * @param listener the [DataSourceCallback] listener.
-     */
-    fun setDataSourceListener(listener: DataSourceCallback?) {
-        mListener = listener
-    }
-
     /**
      * Handles loading data either from cache or from the API itself. This function will insert
      * the data fetched from the API into the cache if it's not in the database already.
@@ -87,12 +82,10 @@ class ThumbnailComicDataSource @Inject constructor(
      * @param pageNum indicates which set of thumbnail data to fetch.
      * @param loadCallback a callback that execute the load callbacks from the data source functions.
      *
-     * @see loadInitial
-     * @see loadAfter
      */
     private fun loadData(pageNum: Int, loadCallback: (thumbnailList: List<ThumbnailData>) -> Unit) {
         // Fetch the cached thumbnail list.
-        val cacheSource = thumbnailDao.getThumbnailPage(pageNum).doOnError { Timber.e(it) }
+        val cacheSource = thumbnailDao.getThumbnailPage(pageNum)
         // Check if cached list is empty, if it is then fetch source list from API.
         cacheSource.observeOn(AndroidSchedulers.mainThread())
             .flatMap { cachedList ->
@@ -102,8 +95,10 @@ class ThumbnailComicDataSource @Inject constructor(
             .subscribe(
                 { thumbnailList ->
                     loadCallback(thumbnailList)
+                    thumbnailNetworkState.postValue(NetworkStatus.success())
                 }, {
                     Timber.e(it)
+                    thumbnailNetworkState.postValue(NetworkStatus.failure(it))
                 }).addTo(disposables)
     }
 
@@ -115,12 +110,9 @@ class ThumbnailComicDataSource @Inject constructor(
      * @return an Observable that handles caching and fetching thumbnail page data.
      */
     private fun fetchThumbnailPage(pageNum: Int) = dragaliaApi.fetchComicStripPage(pageNum)
-        .doOnError { Timber.e(it) }
         .map {
             val sourceList = it.toThumbnailData(pageNum)
             thumbnailDao.insertThumbnailData(sourceList)
             sourceList
         }
-
-
 }
