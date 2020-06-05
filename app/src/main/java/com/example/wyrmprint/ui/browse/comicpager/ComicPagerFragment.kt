@@ -3,15 +3,21 @@ package com.example.wyrmprint.ui.browse.comicpager
 import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import coil.api.load
 import coil.decode.DataSource
 import coil.request.Request
+import com.example.wyrmprint.data.local.ComicStrip
+import com.example.wyrmprint.data.model.NetworkState
 import com.example.wyrmprint.databinding.FragComicStripReaderBinding
 import com.example.wyrmprint.injection.injector
 import com.example.wyrmprint.injection.viewModel
@@ -26,6 +32,7 @@ class ComicPagerFragment : Fragment() {
     private var safeArgs: MainReaderActivityArgs? = null
     private val viewModel: ComicPagerViewModel by viewModel { injector.comicPagerViewModel }
     private var systemUiHelper: SystemUiHelper? = null
+    private var retryButton : Button? = null
 
     // Comic strip image size
     private val imgWidth = 650
@@ -47,22 +54,40 @@ class ComicPagerFragment : Fragment() {
         initObservers(viewModel)
         createSystemUiHelper()
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-
+        constructRetryButton()
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.showSystemUi(false)
-        binding.comicStrip.setOnPhotoTapListener { _, _, _ ->
-            toggleSystemUi()
-        }
+        binding.comicStripLayout.setOnClickListener { toggleSystemUi() }
+        binding.comicStrip.setOnPhotoTapListener { _, _, _ -> toggleSystemUi() }
         viewModel.onOrientationChange(resources.configuration.orientation)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         viewModel.onOrientationChange(newConfig.orientation)
+    }
+
+    /**
+     * Create the [retryButton] Button.
+     */
+    private fun constructRetryButton(){
+        val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        layoutParams.gravity = Gravity.CENTER
+        retryButton = Button(requireContext()).apply {
+            gravity = Gravity.CENTER_HORIZONTAL
+            text = "Retry"
+            textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+            setLayoutParams(layoutParams)
+            setOnClickListener {
+                val comicId = safeArgs?.comicId ?: -1
+                viewModel.requestComicDetails(comicId)
+                binding.comicStripLayout.removeView(this)
+            }
+        }
     }
 
     /**
@@ -89,15 +114,25 @@ class ComicPagerFragment : Fragment() {
                         configureImageViewScale(it.comicUrl, binding.comicStrip)
                     }
                 }
-                comicNetworkState.inProgress -> {
-                    binding.comicStripLoader.visibility = View.VISIBLE
-                }
-                else -> {
-                    Toast.makeText(requireContext(), "An error has occurred", Toast.LENGTH_SHORT)
-                        .show()
-                }
+                comicNetworkState.inProgress -> binding.comicStripLoader.visibility = View.VISIBLE
+                else -> handleNetworkError(comicNetworkState)
             }
         })
+    }
+
+    /**
+     * Handle any network errors and show UI to user.
+     *
+     * @param comicNetworkState [NetworkState] object.
+     */
+    private fun handleNetworkError(comicNetworkState: NetworkState<ComicStrip>) {
+        val errMsg =
+            comicNetworkState.err?.message ?: "An unexpected error has occurred."
+        Toast.makeText(requireContext(), errMsg, Toast.LENGTH_SHORT)
+            .show()
+        binding.comicStripLoader.visibility = View.GONE
+        binding.comicStripLayout.removeView(retryButton)
+        binding.comicStripLayout.addView(retryButton)
     }
 
     /**

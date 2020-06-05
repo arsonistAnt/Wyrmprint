@@ -5,6 +5,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/comic_strip_layout"
         android:background="@drawable/back_drop">
 
         <com.example.wyrmprint.ui.browse.comicpager.ComicStripView
