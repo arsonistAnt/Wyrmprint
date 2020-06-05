@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import coil.api.load
@@ -71,7 +72,7 @@ class ComicPagerFragment : Fragment() {
      */
     private fun initObservers(viewModel: ComicPagerViewModel) {
         viewModel.orientation.observe(viewLifecycleOwner, Observer {
-            safeArgs?.run { configureImageViewScale(safeArgs!!, binding.comicStrip) }
+            safeArgs?.run { viewModel.requestComicDetails(comicId) }
         })
         viewModel.systemUiVisible.observe(viewLifecycleOwner, Observer { show ->
             if (show) {
@@ -80,24 +81,36 @@ class ComicPagerFragment : Fragment() {
                 systemUiHelper?.hide()
             }
         })
+
+        viewModel.comicDetailsState.observe(viewLifecycleOwner, Observer { comicNetworkState ->
+            when {
+                comicNetworkState.success -> {
+                    comicNetworkState.data?.let {
+                        configureImageViewScale(it.comicUrl, binding.comicStrip)
+                    }
+                }
+                comicNetworkState.inProgress -> {
+                    binding.comicStripLoader.visibility = View.VISIBLE
+                }
+                else -> {
+                    Toast.makeText(requireContext(), "An error has occurred", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+        })
     }
 
     /**
      * Configure the comic strip bitmap scale in the [PhotoView] based on current dimensions of the view.
      */
     private fun configureImageViewScale(
-        safeArgs: MainReaderActivityArgs,
+        comicUrl: String,
         comicStripView: PhotoView
     ) {
         safeArgs.apply {
             comicStripView.load(comicUrl) {
                 size(imgWidth, imgHeight)
                 listener(object : Request.Listener {
-                    override fun onStart(data: Any) {
-                        binding.comicStripLoader.visibility = View.VISIBLE
-                        binding.comicStrip.visibility = View.INVISIBLE
-                    }
-
                     override fun onSuccess(data: Any, source: DataSource) {
                         binding.comicStrip.post {
                             binding.comicStrip.autoSizeImage()
@@ -117,8 +130,6 @@ class ComicPagerFragment : Fragment() {
         viewModel.systemUiVisible.value?.let { show ->
             if (show) {
                 viewModel.showSystemUi(false)
-
-
             } else
                 viewModel.showSystemUi(true)
         }

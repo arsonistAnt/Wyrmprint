@@ -119,7 +119,7 @@ class BrowseFragment : Fragment() {
             (item as ThumbnailItemView).thumbnailData?.apply {
                 val action = BrowseFragmentDirections.actionBrowseFragmentToComicPagerActivity(
                     comicUrl,
-                    id
+                    comicId
                 )
                 findNavController().navigate(action)
             }

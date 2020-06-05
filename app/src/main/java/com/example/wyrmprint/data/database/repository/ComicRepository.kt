@@ -21,6 +21,7 @@ class ComicRepository @Inject constructor(
      */
     fun getComicDetail(comicId: Int) = dragaliaApi.fetchComicStripDetails(comicId)
 
+
     /**
      * Return a [ThumbnailDataSourceFactory]
      */
