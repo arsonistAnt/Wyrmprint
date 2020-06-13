@@ -3,10 +3,7 @@ package com.example.wyrmprint.ui.browse.comicpager
 import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -21,17 +18,16 @@ import com.example.wyrmprint.data.model.NetworkState
 import com.example.wyrmprint.databinding.FragComicStripReaderBinding
 import com.example.wyrmprint.injection.injector
 import com.example.wyrmprint.injection.viewModel
+import com.example.wyrmprint.ui.base.UIVisibilityAction
 import com.example.wyrmprint.ui.base.MainReaderActivity
 import com.example.wyrmprint.ui.base.MainReaderActivityArgs
 import com.example.wyrmprint.ui.viewmodels.ComicPagerViewModel
 import com.github.chrisbanes.photoview.PhotoView
-import me.zhanghai.android.systemuihelper.SystemUiHelper
 
 class ComicPagerFragment : Fragment() {
     lateinit var binding: FragComicStripReaderBinding
     private var safeArgs: MainReaderActivityArgs? = null
     private val viewModel: ComicPagerViewModel by viewModel { injector.comicPagerViewModel }
-    private var systemUiHelper: SystemUiHelper? = null
     private var retryButton : Button? = null
 
     // Comic strip image size
@@ -52,7 +48,6 @@ class ComicPagerFragment : Fragment() {
         binding = FragComicStripReaderBinding.inflate(inflater, container, false)
         binding.comicStrip.autoScaleWidth = false
         initObservers(viewModel)
-        createSystemUiHelper()
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         constructRetryButton()
         return binding.root
@@ -101,9 +96,10 @@ class ComicPagerFragment : Fragment() {
         })
         viewModel.systemUiVisible.observe(viewLifecycleOwner, Observer { show ->
             if (show) {
-                systemUiHelper?.show()
+                (requireActivity() as UIVisibilityAction).show()
+
             } else {
-                systemUiHelper?.hide()
+                (requireActivity() as UIVisibilityAction).hide()
             }
         })
 
@@ -168,15 +164,5 @@ class ComicPagerFragment : Fragment() {
             } else
                 viewModel.showSystemUi(true)
         }
-    }
-
-    /**
-     * Initialize the [SystemUiHelper] util object.
-     */
-    private fun createSystemUiHelper() {
-        val level = SystemUiHelper.LEVEL_IMMERSIVE
-        val flags = SystemUiHelper.FLAG_IMMERSIVE_STICKY or
-                SystemUiHelper.FLAG_LAYOUT_IN_SCREEN_OLDER_DEVICES
-        systemUiHelper = SystemUiHelper(requireActivity(), level, flags)
     }
 }
