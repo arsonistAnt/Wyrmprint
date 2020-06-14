@@ -4,15 +4,16 @@ import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.*
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import coil.api.load
 import coil.decode.DataSource
 import coil.request.Request
+import com.example.wyrmprint.R
 import com.example.wyrmprint.data.local.ComicStrip
 import com.example.wyrmprint.data.model.NetworkState
 import com.example.wyrmprint.databinding.FragComicStripReaderBinding
@@ -23,12 +24,19 @@ import com.example.wyrmprint.ui.base.MainReaderActivity
 import com.example.wyrmprint.ui.base.MainReaderActivityArgs
 import com.example.wyrmprint.ui.viewmodels.ComicPagerViewModel
 import com.github.chrisbanes.photoview.PhotoView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.android.synthetic.main.activity_main_reader.*
+import kotlinx.android.synthetic.main.frag_comic_strip_reader.*
+import kotlinx.android.synthetic.main.reader_bottom_sheet_layout.view.*
 
 class ComicPagerFragment : Fragment() {
     lateinit var binding: FragComicStripReaderBinding
     private var safeArgs: MainReaderActivityArgs? = null
     private val viewModel: ComicPagerViewModel by viewModel { injector.comicPagerViewModel }
-    private var retryButton : Button? = null
+    private var retryButton: Button? = null
+
+    private var bottomSheetLayout: View? = null
+    private var bottomBehavior: BottomSheetBehavior<View>? = null
 
     // Comic strip image size
     private val imgWidth = 650
@@ -38,6 +46,7 @@ class ComicPagerFragment : Fragment() {
     override fun onAttach(activity: Activity) {
         super.onAttach(activity)
         safeArgs = (activity as MainReaderActivity).safeArgs
+        //addComicButtonListeners()
     }
 
     override fun onCreateView(
@@ -50,6 +59,8 @@ class ComicPagerFragment : Fragment() {
         initObservers(viewModel)
         requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         constructRetryButton()
+        // Setup prev and next comic button listeners.
+        constructBottomSheet()
         return binding.root
     }
 
@@ -59,6 +70,7 @@ class ComicPagerFragment : Fragment() {
         binding.comicStripLayout.setOnClickListener { toggleSystemUi() }
         binding.comicStrip.setOnPhotoTapListener { _, _, _ -> toggleSystemUi() }
         viewModel.onOrientationChange(resources.configuration.orientation)
+
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -66,11 +78,15 @@ class ComicPagerFragment : Fragment() {
         viewModel.onOrientationChange(newConfig.orientation)
     }
 
+
     /**
      * Create the [retryButton] Button.
      */
-    private fun constructRetryButton(){
-        val layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+    private fun constructRetryButton() {
+        val layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        )
         layoutParams.gravity = Gravity.CENTER
         retryButton = Button(requireContext()).apply {
             gravity = Gravity.CENTER_HORIZONTAL
@@ -83,6 +99,59 @@ class ComicPagerFragment : Fragment() {
                 binding.comicStripLayout.removeView(this)
             }
         }
+    }
+
+    /**
+     * Add the previous and next buttons listener on the bottom sheet header in the [MainReaderActivity].
+     */
+    private fun addComicButtonListeners(bottomSheetLayout: View) {
+        val prevBtn = bottomSheetLayout.prev_comic_btn
+        val nextBtn = bottomSheetLayout.next_comic_btn
+        prevBtn.setOnClickListener {
+            viewModel.requestComicDetails(viewModel.prevComicId)
+        }
+        nextBtn.setOnClickListener {
+            viewModel.requestComicDetails(viewModel.nextComicId)
+        }
+    }
+
+    /**
+     * Construct bottom sheet for the [MainReaderActivity]
+     */
+    private fun constructBottomSheet() {
+        bottomSheetLayout = binding.root.rootView.bottom_sheet_test
+        bottomBehavior = BottomSheetBehavior.from(bottomSheetLayout!!)
+        // Get header of the bottom sheet and calculate its height.
+        val header = bottomSheetLayout!!.findViewById<View>(R.id.header_container_bottom_sheet)
+        // Measure the height of the header to give to the peekHeight.
+        header.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        binding.comicStripLayout.setOnSystemUiVisibilityChangeListener { sysFlags ->
+            when (sysFlags) {
+                MainReaderActivity.SystemUIState.UIVisible.ordinal -> {
+                    bottomBehavior?.isHideable = false
+                    bottomBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+                else -> {
+                    bottomBehavior?.isHideable = true
+                    bottomBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+                }
+            }
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(bottomSheetLayout!!) { v, insets ->
+            bottomBehavior?.peekHeight = header.measuredHeight + insets.systemWindowInsetBottom
+            v.updatePadding(bottom = insets.systemWindowInsetBottom)
+            insets
+        }
+        bottomBehavior?.apply {
+            isFitToContents = true
+            isGestureInsetBottomIgnored = true
+            peekHeight = header.measuredHeight
+            skipCollapsed = false
+            isHideable = true
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        addComicButtonListeners(bottomSheetLayout!!)
     }
 
     /**
@@ -108,6 +177,9 @@ class ComicPagerFragment : Fragment() {
                 comicNetworkState.success -> {
                     comicNetworkState.data?.let {
                         configureImageViewScale(it.comicUrl, binding.comicStrip)
+                        updateComicInfo(it)
+                        viewModel.prevComicId = it.prevStrip.id
+                        viewModel.nextComicId = it.nextStrip.id
                     }
                 }
                 comicNetworkState.inProgress -> binding.comicStripLoader.visibility = View.VISIBLE
@@ -161,8 +233,20 @@ class ComicPagerFragment : Fragment() {
         viewModel.systemUiVisible.value?.let { show ->
             if (show) {
                 viewModel.showSystemUi(false)
-            } else
+
+            } else {
                 viewModel.showSystemUi(true)
+            }
         }
+    }
+
+    /**
+     * Update the comic title and comic number on the bottom sheet bar and the app bar title.
+     */
+    private fun updateComicInfo(comicInfo: ComicStrip) {
+        requireActivity().findViewById<TextView>(R.id.comic_title_text)
+            .text = comicInfo.title
+        (requireActivity() as AppCompatActivity).supportActionBar
+            ?.title = "Dragalia Life | #${comicInfo.episodeNumber}"
     }
 }

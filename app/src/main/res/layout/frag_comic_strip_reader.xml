@@ -2,25 +2,26 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/comic_strip_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/comic_strip_layout"
         android:background="@drawable/back_drop">
 
         <com.example.wyrmprint.ui.browse.comicpager.ComicStripView
             android:id="@+id/comic_strip"
-            app:customScaleType="autoScaleWidth"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:customScaleType="autoScaleWidth" />
 
         <ProgressBar
             android:id="@+id/comic_strip_loader"
-            style="?android:attr/progressBarStyle"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:visibility="gone" />
 
-    </FrameLayout>
+        <include layout="@layout/reader_bottom_sheet_layout"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
