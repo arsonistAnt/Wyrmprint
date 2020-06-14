@@ -2,6 +2,7 @@ package com.example.wyrmprint.ui.base
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.updatePadding
@@ -14,6 +15,8 @@ import com.example.wyrmprint.injection.component.DaggerActivityComponent
 import com.example.wyrmprint.injection.module.ContextModule
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_main_reader.*
+import kotlinx.android.synthetic.main.reader_bottom_sheet_layout.*
+import kotlinx.android.synthetic.main.retry_item_view_holder.*
 import me.zhanghai.android.systemuihelper.SystemUiHelper
 
 
@@ -23,6 +26,8 @@ class MainReaderActivity : AppCompatActivity(), InjectionProvider, UIVisibilityA
         DaggerActivityComponent.builder().contextModule(contextModule).build()
     }
     val safeArgs: MainReaderActivityArgs by navArgs()
+
+
     private var systemUiHelper: SystemUiHelper? = null
 
     enum class SystemUIState(stateNum: Int) {
@@ -35,12 +40,6 @@ class MainReaderActivity : AppCompatActivity(), InjectionProvider, UIVisibilityA
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setContentView(R.layout.activity_main_reader)
         createSystemUiHelper()
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        constructBottomSheet()
-
     }
 
     override fun onBackPressed() {
@@ -58,42 +57,7 @@ class MainReaderActivity : AppCompatActivity(), InjectionProvider, UIVisibilityA
         systemUiHelper?.hide()
     }
 
-    /**
-     * Construct bottom sheet for the [MainReaderActivity]
-     */
-    private fun constructBottomSheet() {
-        val bottomSheet = findViewById<View>(R.id.bottom_sheet_test)
-        val bottomBehavior = BottomSheetBehavior.from(bottomSheet)
-        // Get header of the bottom sheet and calculate its height.
-        val header = bottomSheet.findViewById<View>(R.id.text_header)
-        // Measure the height of the header to give to the peekHeight.
-        header.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-        main_reader_container?.setOnSystemUiVisibilityChangeListener { sysFlags ->
-            when (sysFlags) {
-                SystemUIState.UIVisible.ordinal -> {
-                    bottomBehavior.isHideable = false
-                    bottomBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-                else -> {
-                    bottomBehavior.isHideable = true
-                    bottomBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                }
-            }
-        }
-        ViewCompat.setOnApplyWindowInsetsListener(bottomSheet) { v, insets ->
-            bottomBehavior.peekHeight = header.measuredHeight + insets.systemWindowInsetBottom
-            v.updatePadding(bottom = insets.systemWindowInsetBottom)
-            insets
-        }
-        bottomBehavior.apply {
-            isFitToContents = true
-            isGestureInsetBottomIgnored = true
-            peekHeight = header.measuredHeight
-            skipCollapsed = false
-            isHideable = true
-            state = BottomSheetBehavior.STATE_HIDDEN
-        }
-    }
+
 
     /**
      * Initialize the [SystemUiHelper] util object.
