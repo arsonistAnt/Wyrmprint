@@ -33,6 +33,9 @@ class ComicPagerViewModel @Inject constructor(
     val comicDetailsState: LiveData<NetworkState<ComicStrip>>
         get() = _comicDetailsState
 
+    var prevComicId : Int = -1
+    var nextComicId : Int = -1
+
     /**
      * Stores the current system configuration in the [_orientation] live data integer.
      *

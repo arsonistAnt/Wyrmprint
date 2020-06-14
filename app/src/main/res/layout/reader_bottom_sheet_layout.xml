@@ -1,44 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet_test"
     style="?attr/bottomSheetStyle"
     android:layout_width="match_parent"
-    android:clickable="true"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:background="@color/white"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-    android:focusable="true">
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:weightSum="12"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-    <TextView
-        android:padding="16dp"
-        android:id="@+id/text_header"
+    <LinearLayout
+        android:id="@+id/header_container_bottom_sheet"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Main Header" />
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:paddingBottom="4dp">
 
-    <TextView
+        <ImageButton
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/ic_chevron_up" />
+
+        <View
+            android:layout_width="match_parent"
+            android:background="@color/light_grey"
+            android:layout_height="1dp"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/prev_comic_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                app:srcCompat="@drawable/ic_skip_previous" />
+
+            <TextView
+                android:id="@+id/comic_title_text"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:fontFamily="@font/ms_pgothic"
+                android:gravity="center_vertical"
+                android:text="@string/comic_title_placeholder"
+                android:textAlignment="center"
+                android:textColor="@color/royal_blue"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/next_comic_btn"
+                app:layout_constraintStart_toEndOf="@+id/prev_comic_btn"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="RtlCompat" />
+
+            <ImageButton
+                android:id="@+id/next_comic_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_skip_next"
+                tools:ignore="ContentDescription" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+    </LinearLayout>
+
+    <View
+        android:background="@color/light_grey"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Text" />
+        android:layout_height="1dp"/>
 
-    <TextView
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="4dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Text" />
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Text" />
+        <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent" android:padding="16dp"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Text" />
+            <ImageButton
+                android:id="@+id/imageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
 
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_heart_outline" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="16"
+            android:text="Save to Favorites..." />
+    </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:padding="16dp"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/imageButton1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/ic_download_circle_outline" />
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="16"
+                android:text="Download comic..." />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:padding="16dp"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/imageButton2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/ic_share_variant" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="16"
+                android:text="Share comic via..." />
+        </LinearLayout>
+
+    </LinearLayout>
 
 
 </LinearLayout>
