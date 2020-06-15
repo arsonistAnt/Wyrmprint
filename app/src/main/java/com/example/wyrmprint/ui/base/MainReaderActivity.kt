@@ -31,7 +31,7 @@ class MainReaderActivity : AppCompatActivity(), InjectionProvider, UIVisibilityA
     private var systemUiHelper: SystemUiHelper? = null
 
     enum class SystemUIState(stateNum: Int) {
-        UIVisible(0),
+            UIVisible(0),
         UIHidden(7)
     }
 

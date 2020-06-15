@@ -22,12 +22,19 @@
         android:paddingEnd="4dp"
         android:paddingBottom="4dp">
 
-        <ImageButton
+        <LinearLayout
             android:layout_width="match_parent"
 
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            app:srcCompat="@drawable/ic_chevron_up" />
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/drag_up_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_chevron_up" />
+        </LinearLayout>
+
+
 
         <View
             android:layout_width="match_parent"
