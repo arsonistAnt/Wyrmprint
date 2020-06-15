@@ -113,6 +113,18 @@ class ComicPagerFragment : Fragment() {
         nextBtn.setOnClickListener {
             viewModel.requestComicDetails(viewModel.nextComicId)
         }
+
+        // Set click listener for expand button to expand and collapse reader sheet.
+        val dragUpBtn = bottomSheetLayout.drag_up_btn
+        dragUpBtn.setOnClickListener {
+            bottomBehavior?.apply {
+                state = when(state){
+                    BottomSheetBehavior.STATE_COLLAPSED -> BottomSheetBehavior.STATE_EXPANDED
+                    BottomSheetBehavior.STATE_EXPANDED -> BottomSheetBehavior.STATE_COLLAPSED
+                    else -> BottomSheetBehavior.STATE_SETTLING
+                }
+            }
+        }
     }
 
     /**
