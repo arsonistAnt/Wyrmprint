@@ -17,6 +17,17 @@ data class ThumbnailData(
     var favorite: Boolean = false
 )
 
+@Entity(tableName = "thumbnail_favorites")
+data class ThumbnailFavorite(
+    @PrimaryKey
+    val comicId: Int,
+    val comicTitle: String,
+    val comicNumber: Int,
+    val comicUrl: String,
+    val thumbnailLarge: String,
+    val thumbnailSmall: String
+)
+
 /**
  * Wrap a [ThumbnailData] object into a [ThumbnailItemView] and return it.
  */

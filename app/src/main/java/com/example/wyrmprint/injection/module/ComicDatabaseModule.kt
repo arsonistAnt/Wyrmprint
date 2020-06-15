@@ -20,4 +20,8 @@ class ComicDatabaseModule {
     @Singleton
     @Provides
     fun thumbnailDao(db: ComicDatabase) = db.thumbnailDao()
+
+    @Singleton
+    @Provides
+    fun favoritesDao(db : ComicDatabase) = db.favoritesDao()
 }
