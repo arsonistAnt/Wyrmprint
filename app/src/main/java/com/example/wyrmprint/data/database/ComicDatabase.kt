@@ -1,6 +1,7 @@
 package com.example.wyrmprint.data .database
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.ThumbnailFavorite

@@ -53,7 +53,7 @@ class BrowseFragment : Fragment() {
 
     companion object {
         // Diff config for the comic thumbnail paged model adapter.
-        val comicThumbnailDiff = AsyncDifferConfig.Builder<ThumbnailData>(object :
+        val comicThumbnailDiff = AsyncDifferConfig.Builder(object :
             DiffUtil.ItemCallback<ThumbnailData>() {
             override fun areItemsTheSame(
                 oldItem: ThumbnailData,
@@ -123,7 +123,14 @@ class BrowseFragment : Fragment() {
                 )
                 findNavController().navigate(action)
             }
-            false
+            true
+        }
+        onLongClickListener = { _, _, item, _ ->
+            (item as ThumbnailItemView).thumbnailData?.apply {
+                browserViewModel.addToFavorites(this)
+                Toast.makeText(requireContext(), "Long clicked.", Toast.LENGTH_SHORT).show()
+            }
+            true
         }
     }
 

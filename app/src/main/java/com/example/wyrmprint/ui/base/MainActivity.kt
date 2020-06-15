@@ -69,6 +69,13 @@ class MainActivity : AppCompatActivity(), InjectionProvider {
         val navController = findNavController(R.id.fragment_nav_component)
         addBottomNavIcons(mainBinding.mainNavbarBottom.menu)
         NavigationUI.setupWithNavController(mainBinding.mainNavbarBottom, navController)
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            title = when(destination.id){
+                R.id.favoriteFragment -> "Favorites"
+                R.id.browseFragment -> "Browse"
+                else -> supportActionBar?.title
+            }
+        }
     }
 
     /**

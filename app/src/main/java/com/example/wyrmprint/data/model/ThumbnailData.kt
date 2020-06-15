@@ -32,3 +32,31 @@ data class ThumbnailFavorite(
  * Wrap a [ThumbnailData] object into a [ThumbnailItemView] and return it.
  */
 fun ThumbnailData.toThumbnailItemView() = ThumbnailItemView(this)
+
+/**
+ * Convert thumbnail data to [ThumbnailFavorite] objects.
+ */
+fun ThumbnailData.toFavoriteThumbnail() = ThumbnailFavorite(
+    this.comicId,
+    this.comicTitle,
+    this.comicNumber,
+    this.comicUrl,
+    this.thumbnailLarge,
+    this.thumbnailSmall
+)
+
+/**
+ * Convert a list of [ThumbnailFavorite] to a list of [ThumbnailItemView] objects.
+ */
+fun List<ThumbnailFavorite>.toThumbnailItemView() = this.map {
+    val thumbnailData =ThumbnailData(
+        it.comicId,
+        it.comicTitle,
+        it.comicNumber,
+        "",
+        -1,
+        it.thumbnailLarge,
+        it.thumbnailSmall
+    )
+    ThumbnailItemView(thumbnailData)
+}
