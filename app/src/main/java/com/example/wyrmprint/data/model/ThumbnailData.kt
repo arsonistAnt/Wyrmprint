@@ -28,6 +28,16 @@ data class ThumbnailFavorite(
     val thumbnailSmall: String
 )
 
+interface FavoriteUtil {
+    companion object {
+        /**
+         * Create an empty Thumbnail Favorite object.
+         */
+        fun createEmptyThumbnailFavorite() = ThumbnailFavorite(-1, "", -1, "", "", "")
+    }
+}
+
+
 /**
  * Wrap a [ThumbnailData] object into a [ThumbnailItemView] and return it.
  */
@@ -49,7 +59,7 @@ fun ThumbnailData.toFavoriteThumbnail() = ThumbnailFavorite(
  * Convert a list of [ThumbnailFavorite] to a list of [ThumbnailItemView] objects.
  */
 fun List<ThumbnailFavorite>.toThumbnailItemView() = this.map {
-    val thumbnailData =ThumbnailData(
+    val thumbnailData = ThumbnailData(
         it.comicId,
         it.comicTitle,
         it.comicNumber,
@@ -58,5 +68,6 @@ fun List<ThumbnailFavorite>.toThumbnailItemView() = this.map {
         it.thumbnailLarge,
         it.thumbnailSmall
     )
-    ThumbnailItemView(thumbnailData)
+    // Set the identifier to the comic ID.
+    ThumbnailItemView(thumbnailData).apply { identifier = it.comicId.toLong() }
 }

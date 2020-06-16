@@ -12,4 +12,5 @@
     <string name="no_favorites_message" tools:ignore="TypographyEllipsis">No comic strips have been added to the favorites list...</string>
     <string name="retry_item_button_str">Retry</string>
     <string name="comic_title_placeholder">Comic Title</string>
+    <string name="remove_menu_item">Remove</string>
 </resources>

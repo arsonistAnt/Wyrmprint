@@ -1,7 +1,6 @@
-package com.example.wyrmprint.data .database
+package com.example.wyrmprint.data.database
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.ThumbnailFavorite
@@ -26,6 +25,9 @@ interface ThumbnailFavoritesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertFavorites(thumbnailData: List<ThumbnailFavorite>)
+
+    @Delete
+    fun deleteFavoriteRecords(favoriteComics: List<ThumbnailFavorite>)
 
     @Query("DELETE FROM thumbnail_favorites")
     fun clearThumbnailData()

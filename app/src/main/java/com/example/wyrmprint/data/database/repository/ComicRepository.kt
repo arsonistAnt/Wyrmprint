@@ -3,12 +3,12 @@ package com.example.wyrmprint.data.database.repository
 import com.example.wyrmprint.data.database.ThumbnailCacheDao
 import com.example.wyrmprint.data.database.ThumbnailFavoritesDao
 import com.example.wyrmprint.data.model.ThumbnailData
+import com.example.wyrmprint.data.model.ThumbnailFavorite
 import com.example.wyrmprint.data.model.toFavoriteThumbnail
 import com.example.wyrmprint.data.remote.DragaliaLifeApi
 import com.example.wyrmprint.data.remote.pager.ThumbnailDataSourceFactory
 import dagger.Reusable
 import io.reactivex.disposables.CompositeDisposable
-import java.util.stream.Collectors.toList
 import javax.inject.Inject
 
 @Reusable
@@ -36,7 +36,7 @@ class ComicRepository @Inject constructor(
      *
      * @param thumbnailData the comic thumbnail data to insert.
      */
-    suspend fun saveFavoriteComic(thumbnailData: ThumbnailData) {
+    fun saveFavoriteComic(thumbnailData: ThumbnailData) {
         favoritesDao.insertFavorites(listOf(thumbnailData.toFavoriteThumbnail()))
     }
 
@@ -46,4 +46,13 @@ class ComicRepository @Inject constructor(
      * @return a list of favorited thumbnails.
      */
     fun getFavoriteComics() = favoritesDao.getFavorites()
+
+    /**
+     * Delete favorited comics from the database.
+     *
+     * @param favoriteComics a list of []
+     */
+    fun removeFavoriteComics(favoriteComics: List<ThumbnailFavorite>) {
+        favoritesDao.deleteFavoriteRecords(favoriteComics)
+    }
 }
