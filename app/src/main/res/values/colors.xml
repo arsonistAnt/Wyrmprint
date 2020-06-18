@@ -6,6 +6,9 @@
     <color name="colorAccent">#D81B60</color>
     <color name="dragalia_gray_text_color">#333333</color>
 
+    <!--Gradient Colors-->
+    <color name="black_highlight_gradient">#80000000</color>
+
     <!--Basic Colors-->
     <color name="white">#FFFFFF</color>
     <color name="ivory">#FFFFF0</color>

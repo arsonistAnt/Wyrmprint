@@ -3,63 +3,82 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <FrameLayout
+    <LinearLayout
+        android:id="@+id/favorites_container"
+        android:orientation="vertical"
+        android:background="@drawable/favorites_bg"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/back_drop">
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/ribbon_image_bg"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/favorites_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="75dp"
-            app:srcCompat="@drawable/bg_red_band"
-            tools:ignore="ContentDescription" />
+            android:clipToPadding="false"
+            android:padding="4dp"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
+            android:id="@+id/empty_favorites_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:visibility="gone">
 
-            <LinearLayout
-                android:id="@+id/no_favorites_container"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/ic_favorites_mess_card"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintDimensionRatio="15:9"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.35">
+            <ImageView
+                android:id="@+id/ribbon_image_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="75dp"
+                app:srcCompat="@drawable/bg_red_band"
+                tools:ignore="ContentDescription" />
 
-                <TextView
-                    android:id="@+id/no_favorites_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/ms_pgothic"
-                    android:paddingStart="32dp"
-                    android:paddingTop="32dp"
-                    android:paddingEnd="32dp"
-                    android:text="@string/no_favorites_message"
-                    android:textAlignment="center"
-                    android:textColor="@color/dragalia_gray_text_color"
-                    android:textSize="16sp" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-                <ImageView
-                    android:id="@+id/no_favorites_icon_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingStart="32dp"
-                    android:paddingEnd="32dp"
-                    android:paddingBottom="32dp"
-                    app:srcCompat="@drawable/ic_heart_off"
-                    tools:ignore="contentDescription" />
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/no_favorites_container"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/ic_favorites_mess_card"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="15:9"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.35">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/no_favorites_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/ms_pgothic"
+                        android:paddingStart="32dp"
+                        android:paddingTop="32dp"
+                        android:paddingEnd="32dp"
+                        android:text="@string/no_favorites_message"
+                        android:textAlignment="center"
+                        android:textColor="@color/dragalia_gray_text_color"
+                        android:textSize="16sp" />
 
-    </FrameLayout>
+                    <ImageView
+                        android:id="@+id/no_favorites_icon_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingStart="32dp"
+                        android:paddingEnd="32dp"
+                        android:paddingBottom="32dp"
+                        app:srcCompat="@drawable/ic_heart_off"
+                        tools:ignore="contentDescription" />
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+
 </layout>

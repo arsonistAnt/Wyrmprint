@@ -6,6 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionModeOverlay">true</item>
+        <!-- Back ground color for CAB -->
+        <item name="android:actionModeBackground">@color/colorPrimary</item>
     </style>
 
     <!-- Thumbnail Item Theme -->
@@ -16,10 +19,27 @@
 
     <style name="ThumbnailTheme.Title">
         <item name="android:textSize">16sp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:padding">8dp</item>
     </style>
 
     <style name="ThumbnailTheme.NumberTitle">
         <item name="android:textSize">20sp</item>
     </style>
+
+    <!-- Comic Strip Reader Styles/Themes -->
+    <style name="ComicReaderTheme" parent="ThumbnailTheme">
+        <item name="android:textColor">@color/light_blue</item>
+        <item name="android:fontFamily">@font/ms_pgothic</item>
+    </style>
+
+    <style name="ComicReaderTheme.BottomSheetTitle" parent="ComicReaderTheme">
+        <item name="android:fontFamily">@font/ms_pgothic</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/dodger_blue</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
 
 </resources>

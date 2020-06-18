@@ -31,7 +31,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                app:srcCompat="@drawable/ic_chevron_up" />
+                app:srcCompat="@drawable/ic_chevron_up"
+                tools:ignore="ContentDescription" />
         </LinearLayout>
 
 
@@ -59,14 +60,11 @@
 
             <TextView
                 android:id="@+id/comic_title_text"
+                style="@style/ComicReaderTheme.BottomSheetTitle"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:fontFamily="@font/ms_pgothic"
                 android:gravity="center_vertical"
                 android:text="@string/comic_title_placeholder"
-                android:textAlignment="center"
-                android:textColor="@color/royal_blue"
-                android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/next_comic_btn"
                 app:layout_constraintStart_toEndOf="@+id/prev_comic_btn"
@@ -115,15 +113,16 @@
 
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
-                app:srcCompat="@drawable/ic_heart_outline" />
+                app:srcCompat="@drawable/ic_heart_outline"
+                tools:ignore="ContentDescription" />
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="16"
-            android:text="Save to Favorites..." />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="16"
+                android:text="@string/save_to_fav_desc" />
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
@@ -137,14 +136,15 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:layout_weight="1"
-                app:srcCompat="@drawable/ic_download_circle_outline" />
+                app:srcCompat="@drawable/ic_download_circle_outline"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/textView1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="16"
-                android:text="Download comic..." />
+                android:text="@string/download_comic_desc" />
         </LinearLayout>
 
         <LinearLayout
@@ -159,6 +159,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:layout_weight="1"
+                tools:ignore="ContentDescription"
                 app:srcCompat="@drawable/ic_share_variant" />
 
             <TextView
@@ -167,7 +168,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="16"
-                android:text="Share comic via..." />
+                android:text="@string/share_comic_desc" />
         </LinearLayout>
 
     </LinearLayout>

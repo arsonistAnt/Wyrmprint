@@ -3,13 +3,11 @@ package com.example.wyrmprint.data.remote.pager
 import androidx.annotation.MainThread
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PageKeyedDataSource
-import com.example.wyrmprint.data.database.ThumbnailDao
-import com.example.wyrmprint.data.model.NetworkState
+import com.example.wyrmprint.data.database.ThumbnailCacheDao
 import com.example.wyrmprint.data.model.NetworkStatus
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.toThumbnailData
 import com.example.wyrmprint.data.remote.DragaliaLifeApi
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -23,7 +21,7 @@ import javax.inject.Inject
 class ThumbnailComicDataSource @Inject constructor(
     private val dragaliaApi: DragaliaLifeApi,
     private val disposables: CompositeDisposable,
-    private val thumbnailDao: ThumbnailDao
+    private val thumbnailCacheDao: ThumbnailCacheDao
 ) : PageKeyedDataSource<Int, ThumbnailData>() {
 
     // Represents the current state of the thumbnail paging requests.
@@ -70,7 +68,7 @@ class ThumbnailComicDataSource @Inject constructor(
     }
 
     override fun invalidate() {
-        thumbnailDao.clearThumbnailData()
+        thumbnailCacheDao.clearThumbnailData()
         disposables.clear()
         super.invalidate()
     }
@@ -85,7 +83,7 @@ class ThumbnailComicDataSource @Inject constructor(
      */
     private fun loadData(pageNum: Int, loadCallback: (thumbnailList: List<ThumbnailData>) -> Unit) {
         // Fetch the cached thumbnail list.
-        val cacheSource = thumbnailDao.getThumbnailPage(pageNum)
+        val cacheSource = thumbnailCacheDao.getThumbnailPage(pageNum)
         // Check if cached list is empty, if it is then fetch source list from API.
         cacheSource.observeOn(AndroidSchedulers.mainThread())
             .flatMap { cachedList ->
@@ -115,7 +113,7 @@ class ThumbnailComicDataSource @Inject constructor(
     private fun fetchThumbnailPage(pageNum: Int) = dragaliaApi.fetchComicStripPage(pageNum)
         .map {
             val sourceList = it.toThumbnailData(pageNum)
-            thumbnailDao.insertThumbnailData(sourceList)
+            thumbnailCacheDao.insertThumbnailData(sourceList)
             sourceList
         }
 }

@@ -116,6 +116,7 @@ dependencies {
     implementation "com.mikepenz:fastadapter-extensions-scroll:4.1.1"
     implementation "com.mikepenz:fastadapter-extensions-ui:4.1.1"
     implementation "com.mikepenz:fastadapter-extensions-utils:4.1.1"
+    implementation "com.mikepenz:fastadapter-extensions-diff:4.1.1"
 
     // System UI Helper
     implementation 'me.zhanghai.android.systemuihelper:library:1.0.0'

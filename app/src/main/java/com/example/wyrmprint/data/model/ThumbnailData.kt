@@ -17,7 +17,56 @@ data class ThumbnailData(
     var favorite: Boolean = false
 )
 
+@Entity(tableName = "thumbnail_favorites")
+data class ThumbnailFavorite(
+    @PrimaryKey
+    val comicId: Int,
+    val comicTitle: String,
+    val comicNumber: Int,
+    val comicUrl: String,
+    val thumbnailLarge: String,
+    val thumbnailSmall: String
+)
+
+interface FavoriteUtil {
+    companion object {
+        /**
+         * Create an empty Thumbnail Favorite object.
+         */
+        fun createEmptyThumbnailFavorite() = ThumbnailFavorite(-1, "", -1, "", "", "")
+    }
+}
+
 /**
  * Wrap a [ThumbnailData] object into a [ThumbnailItemView] and return it.
  */
 fun ThumbnailData.toThumbnailItemView() = ThumbnailItemView(this)
+
+/**
+ * Convert thumbnail data to [ThumbnailFavorite] objects.
+ */
+fun ThumbnailData.toFavoriteThumbnail() = ThumbnailFavorite(
+    this.comicId,
+    this.comicTitle,
+    this.comicNumber,
+    this.comicUrl,
+    this.thumbnailLarge,
+    this.thumbnailSmall
+)
+
+/**
+ * Convert a list of [ThumbnailFavorite] to a list of [ThumbnailItemView] objects.
+ */
+fun List<ThumbnailFavorite>.toThumbnailItemView() = this.map {
+    val thumbnailData = ThumbnailData(
+        it.comicId,
+        it.comicTitle,
+        it.comicNumber,
+        "",
+        -1,
+        it.thumbnailLarge,
+        it.thumbnailSmall
+    )
+    // Set the identifier to the comic ID.
+    ThumbnailItemView(thumbnailData).apply { identifier = it.comicId.toLong() }
+}

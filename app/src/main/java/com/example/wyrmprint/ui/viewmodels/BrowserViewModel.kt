@@ -45,4 +45,13 @@ class BrowserViewModel @Inject constructor(private val comicRepo: ComicRepositor
             thumbnailDataSource.value?.invalidate()
         }
     }
+
+    /**
+     * Add this thumbnail to the favorites section in the comic repository.
+     */
+    fun addToFavorites(thumbnailData: ThumbnailData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            comicRepo.saveFavoriteComic(thumbnailData)
+        }
+    }
 }

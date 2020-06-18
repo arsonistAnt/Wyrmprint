@@ -3,10 +3,17 @@ package com.example.wyrmprint.ui.browse.comicpager
 import android.app.Activity
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.*
-import android.widget.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -19,14 +26,12 @@ import com.example.wyrmprint.data.model.NetworkState
 import com.example.wyrmprint.databinding.FragComicStripReaderBinding
 import com.example.wyrmprint.injection.injector
 import com.example.wyrmprint.injection.viewModel
-import com.example.wyrmprint.ui.base.UIVisibilityAction
 import com.example.wyrmprint.ui.base.MainReaderActivity
 import com.example.wyrmprint.ui.base.MainReaderActivityArgs
+import com.example.wyrmprint.ui.base.UIVisibilityAction
 import com.example.wyrmprint.ui.viewmodels.ComicPagerViewModel
 import com.github.chrisbanes.photoview.PhotoView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.activity_main_reader.*
-import kotlinx.android.synthetic.main.frag_comic_strip_reader.*
 import kotlinx.android.synthetic.main.reader_bottom_sheet_layout.view.*
 
 class ComicPagerFragment : Fragment() {
@@ -90,7 +95,7 @@ class ComicPagerFragment : Fragment() {
         layoutParams.gravity = Gravity.CENTER
         retryButton = Button(requireContext()).apply {
             gravity = Gravity.CENTER_HORIZONTAL
-            text = "Retry"
+            text = context.getString(R.string.retry_loading_msg)
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER
             setLayoutParams(layoutParams)
             setOnClickListener {
@@ -150,6 +155,7 @@ class ComicPagerFragment : Fragment() {
             }
         }
         ViewCompat.setOnApplyWindowInsetsListener(bottomSheetLayout!!) { v, insets ->
+            adjustBottomSheetMargin(v, insets)
             bottomBehavior?.peekHeight = header.measuredHeight + insets.systemWindowInsetBottom
             v.updatePadding(bottom = insets.systemWindowInsetBottom)
             insets
@@ -260,5 +266,17 @@ class ComicPagerFragment : Fragment() {
             .text = comicInfo.title
         (requireActivity() as AppCompatActivity).supportActionBar
             ?.title = "Dragalia Life | #${comicInfo.episodeNumber}"
+    }
+
+    /**
+     * Adjust bottom sheet margin on configuration change with
+     * the systems current insets.
+     *
+     * @param bottomSheet the [bottomSheetLayout].
+     * @param insets the [WindowInsetsCompat] to adjust the layout params to.
+     */
+    fun adjustBottomSheetMargin(bottomSheet: View, insets: WindowInsetsCompat) {
+        val marginParams = bottomSheet.layoutParams as ViewGroup.MarginLayoutParams
+        marginParams.leftMargin = insets.systemWindowInsetLeft
     }
 }
