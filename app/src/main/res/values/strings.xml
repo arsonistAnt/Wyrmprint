@@ -13,4 +13,7 @@
     <string name="retry_item_button_str">Retry</string>
     <string name="comic_title_placeholder">Comic Title</string>
     <string name="remove_menu_item">Remove</string>
+    <string name="share_comic_desc">Share comic via…</string>
+    <string name="download_comic_desc">Download comic…</string>
+    <string name="save_to_fav_desc">Save to favorites…</string>
 </resources>

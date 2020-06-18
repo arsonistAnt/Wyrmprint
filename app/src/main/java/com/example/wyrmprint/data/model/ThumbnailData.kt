@@ -37,7 +37,6 @@ interface FavoriteUtil {
     }
 }
 
-
 /**
  * Wrap a [ThumbnailData] object into a [ThumbnailItemView] and return it.
  */

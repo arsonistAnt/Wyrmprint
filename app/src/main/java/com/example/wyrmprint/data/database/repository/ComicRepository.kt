@@ -50,7 +50,7 @@ class ComicRepository @Inject constructor(
     /**
      * Delete favorited comics from the database.
      *
-     * @param favoriteComics a list of []
+     * @param favoriteComics a list of [ThumbnailFavorite] objects
      */
     fun removeFavoriteComics(favoriteComics: List<ThumbnailFavorite>) {
         favoritesDao.deleteFavoriteRecords(favoriteComics)

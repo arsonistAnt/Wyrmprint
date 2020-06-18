@@ -9,13 +9,10 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.AsyncDifferConfig
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wyrmprint.R
 import com.example.wyrmprint.data.model.FavoriteUtil.Companion.createEmptyThumbnailFavorite
-import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.toFavoriteThumbnail
 import com.example.wyrmprint.data.model.toThumbnailItemView
 import com.example.wyrmprint.databinding.FragFavoriteLayoutBinding
@@ -27,7 +24,6 @@ import com.example.wyrmprint.ui.viewmodels.FavoriteViewModel
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.IAdapter
-import com.mikepenz.fastadapter.ISelectionListener
 import com.mikepenz.fastadapter.adapters.ItemAdapter
 import com.mikepenz.fastadapter.helpers.ActionModeHelper
 import com.mikepenz.fastadapter.helpers.UndoHelper
@@ -54,26 +50,6 @@ class FavoriteFragment : Fragment() {
     private lateinit var selectExtension: SelectExtension<ThumbnailItemView>
     private lateinit var actionModeHelper: ActionModeHelper<ThumbnailItemView>
     private lateinit var undoHelper: UndoHelper<*>
-
-    companion object {
-        // Diff config for the comic thumbnail paged model adapter.
-        val favoriteDiffUtil = AsyncDifferConfig.Builder(object :
-            DiffUtil.ItemCallback<ThumbnailData>() {
-            override fun areItemsTheSame(
-                oldItem: ThumbnailData,
-                newItem: ThumbnailData
-            ): Boolean {
-                return oldItem.comicId == newItem.comicId
-            }
-
-            override fun areContentsTheSame(
-                oldItem: ThumbnailData,
-                newItem: ThumbnailData
-            ): Boolean {
-                return oldItem == newItem
-            }
-        }).build()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -164,7 +140,6 @@ class FavoriteFragment : Fragment() {
         }
     }
 
-
     /**
      * Initialize any Observers for the live data in the [FavoriteViewModel]
      */
@@ -207,11 +182,6 @@ class FavoriteFragment : Fragment() {
             isSelectable = true
             multiSelect = true
             selectOnLongClick = true
-            selectionListener = object : ISelectionListener<ThumbnailItemView> {
-                override fun onSelectionChanged(item: ThumbnailItemView, selected: Boolean) {
-                    Timber.i("Favoriteselected: %s", selectExtension.selectedItems.size)
-                }
-            }
         }
         // Configure the adapter to re-route long click and click listeners to the ActionModeHelper
         fastAdapter.apply {
@@ -244,7 +214,6 @@ class FavoriteFragment : Fragment() {
             }.toList()
             viewModel.removeFavorites(favoriteList)
             mode.finish()
-            //we consume the event
             return true
         }
 
@@ -257,10 +226,12 @@ class FavoriteFragment : Fragment() {
         }
 
         override fun onDestroyActionMode(mode: ActionMode) {
+            // Show bottom navigation view and re-attach its HideBottomViewOnScrollBehavior
             showActivityBottomNavigation()
         }
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
+            // Hide bottom navigation view and remove its HideBottomViewOnScrollBehavior
             hideActivityBottomNavigation()
             return false
         }
@@ -274,8 +245,7 @@ class FavoriteFragment : Fragment() {
         }
 
         /**
-         * Hide the bottom navigation view from the activity permanently. This is to
-         * prevent the bottom navigation from reappearing on scrolling.
+         * Hide the bottom navigation view from the activity and remove its [HideBottomViewOnScrollBehavior] behavior.
          */
         private fun hideActivityBottomNavigation() {
             currentBottomNavBehavior.slideDown(requireActivity().main_navbar_bottom)

@@ -18,31 +18,35 @@
             android:paddingRight="16dp"
             android:paddingBottom="12dp">
 
-            <ImageView
-                android:id="@+id/thumbnail_item"
+            <FrameLayout
+                android:id="@+id/thumbnail_image_container"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="@color/dark_red"
-                android:scaleType="centerCrop"
+                android:foreground="@drawable/comic_item_ripple_selection"
                 app:layout_constraintDimensionRatio="H,5:4"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="ContentDescription" />
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/thumbnail_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    tools:ignore="ContentDescription"
+                    tools:src="@drawable/error_connection" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/thumbnail_title"
                 style="@style/ThumbnailTheme.Title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:padding="8dp"
                 android:text="@string/thumbnail_title_place_holder"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/thumbnail_item" />
+                app:layout_constraintTop_toBottomOf="@id/thumbnail_image_container" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
