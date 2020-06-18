@@ -16,4 +16,5 @@
     <string name="share_comic_desc">Share comic via…</string>
     <string name="download_comic_desc">Download comic…</string>
     <string name="save_to_fav_desc">Save to favorites…</string>
+    <string name="retry_loading_msg">Retry</string>
 </resources>
