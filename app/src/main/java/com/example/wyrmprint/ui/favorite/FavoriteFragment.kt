@@ -207,13 +207,16 @@ class FavoriteFragment : Fragment() {
         private lateinit var currentBottomNavBehavior: HideBottomViewOnScrollBehavior<View>
         private lateinit var bottomNavParams: CoordinatorLayout.LayoutParams
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            //as we no longer have a selection so the actionMode can be finished
-            //undoHelper.remove(selectExtension.selections)
-            val favoriteList = selectExtension.selectedItems.map {
-                it.thumbnailData?.toFavoriteThumbnail() ?: createEmptyThumbnailFavorite()
-            }.toList()
-            viewModel.removeFavorites(favoriteList)
-            mode.finish()
+            when (item.itemId) {
+                R.id.remove_menu_item -> {
+                    removeFavoritesOnMultiSelect()
+                    mode.finish()
+                }
+                R.id.select_all_menu_item -> {
+                    selectExtension.select()
+                    mode.title = "${selectExtension.selectedItems.size}"
+                }
+            }
             return true
         }
 
@@ -250,6 +253,16 @@ class FavoriteFragment : Fragment() {
         private fun hideActivityBottomNavigation() {
             currentBottomNavBehavior.slideDown(requireActivity().main_navbar_bottom)
             bottomNavParams.behavior = null
+        }
+
+        /**
+         * Remove favorites given from the [selectExtension] items.
+         */
+        private fun removeFavoritesOnMultiSelect() {
+            val favoriteList = selectExtension.selectedItems.map {
+                it.thumbnailData?.toFavoriteThumbnail() ?: createEmptyThumbnailFavorite()
+            }.toList()
+            viewModel.removeFavorites(favoriteList)
         }
     }
 }

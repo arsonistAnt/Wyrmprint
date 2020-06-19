@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/remove_menu_item"
         android:icon="@drawable/ic_delete"
         android:title="@string/remove_menu_item" />
+    <item
+        android:id="@+id/select_all_menu_item"
+        android:icon="@null"
+        android:title="@string/select_all_menu_item_desc"
+        app:showAsAction="never" />
 </menu>

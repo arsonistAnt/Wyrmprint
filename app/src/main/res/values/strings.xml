@@ -17,4 +17,6 @@
     <string name="download_comic_desc">Download comic…</string>
     <string name="save_to_fav_desc">Save to favorites…</string>
     <string name="retry_loading_msg">Retry</string>
+    <string name="select_all_menu_item_desc">Select All</string>
+    <string name="un_select_all_menu_item_desc">Un-select All</string>
 </resources>
