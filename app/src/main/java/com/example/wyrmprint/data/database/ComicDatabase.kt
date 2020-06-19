@@ -16,6 +16,12 @@ interface ThumbnailCacheDao {
 
     @Query("DELETE FROM thumbnail_data")
     fun clearThumbnailData()
+
+    @Update
+    fun updateThumbnailData(thumbnailData: ThumbnailData)
+
+    @Query("UPDATE thumbnail_data SET isFavorite = :isFavorite WHERE comicId IN (:comicIdList)")
+    fun updateFavorites(comicIdList: List<Int>, isFavorite: Boolean)
 }
 
 @Dao
@@ -31,6 +37,9 @@ interface ThumbnailFavoritesDao {
 
     @Query("DELETE FROM thumbnail_favorites")
     fun clearThumbnailData()
+
+    @Query("SELECT COUNT() FROM thumbnail_favorites WHERE comicId = :id")
+    fun count(id: Int): Int
 }
 
 @Database(entities = [ThumbnailData::class, ThumbnailFavorite::class], version = 1)

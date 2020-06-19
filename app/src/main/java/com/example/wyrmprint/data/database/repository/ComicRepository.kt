@@ -29,7 +29,12 @@ class ComicRepository @Inject constructor(
      * Return a [ThumbnailDataSourceFactory]
      */
     fun getThumbnailDataSourceFactory() =
-        ThumbnailDataSourceFactory(dragaliaApi, compositeDisposable, thumbnailCacheDao)
+        ThumbnailDataSourceFactory(
+            dragaliaApi,
+            compositeDisposable,
+            thumbnailCacheDao,
+            favoritesDao
+        )
 
     /**
      * Insert the [ThumbnailData] into the favorites table in the database.
@@ -54,5 +59,19 @@ class ComicRepository @Inject constructor(
      */
     fun removeFavoriteComics(favoriteComics: List<ThumbnailFavorite>) {
         favoritesDao.deleteFavoriteRecords(favoriteComics)
+    }
+
+    /**
+     * Update the thumbnail data field in the [thumbnailCacheDao].
+     */
+    fun updateCachedThumbnail(thumbnailData: ThumbnailData) {
+        thumbnailCacheDao.updateThumbnailData(thumbnailData)
+    }
+
+    /**
+     * Update the favorite field of the [ThumbnailData] in the [thumbnailCacheDao]
+     */
+    fun updateThumbnailFavoritesField(comicIdList: List<Int>, isFavorite: Boolean) {
+        thumbnailCacheDao.updateFavorites(comicIdList, isFavorite)
     }
 }

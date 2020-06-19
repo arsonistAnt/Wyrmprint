@@ -10,14 +10,32 @@ import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.AbstractItem
 import com.mikepenz.fastadapter.ui.utils.FastAdapterUIUtils
 
-open class ThumbnailItemView(val thumbnailData: ThumbnailData?) :
+open class ThumbnailItemView(
+    val thumbnailData: ThumbnailData?,
+    autoHighlight: Boolean = false
+) :
     AbstractItem<ThumbnailItemView.ThumbnailCardHolder>() {
     override val layoutRes: Int
         get() = R.layout.thumbnail_item
     override val type: Int
         get() = R.id.thumbnail_image_container
 
+    init {
+        // If the thumbnailData is favorited then automatically "select" the item view.
+        if (autoHighlight)
+            shouldSelectAsFavorite()
+    }
+
     override fun getViewHolder(v: View): ThumbnailCardHolder = ThumbnailCardHolder(v)
+
+    /**
+     * Checks if the [ThumbnailItemView] status should be set as selected.
+     */
+    private fun shouldSelectAsFavorite() {
+        thumbnailData?.apply {
+            isSelected = thumbnailData.isFavorite
+        }
+    }
 
     class ThumbnailCardHolder(view: View) : FastAdapter.ViewHolder<ThumbnailItemView>(view) {
         private val thumbnailImage: ImageView? = view.findViewById(R.id.thumbnail_image)

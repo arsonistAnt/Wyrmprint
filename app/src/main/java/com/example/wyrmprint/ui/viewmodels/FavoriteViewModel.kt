@@ -23,6 +23,7 @@ class FavoriteViewModel @Inject constructor(private val comicRepository: ComicRe
     fun removeFavorites(favorites: List<ThumbnailFavorite>) {
         viewModelScope.launch(Dispatchers.IO) {
             comicRepository.removeFavoriteComics(favorites)
+            comicRepository.updateThumbnailFavoritesField(favorites.map { it.comicId }, false)
         }
     }
 }

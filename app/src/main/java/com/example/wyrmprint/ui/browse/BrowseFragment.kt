@@ -102,7 +102,6 @@ class BrowseFragment : Fragment() {
             browserViewModel.invalidateThumbnailData()
             userSwiped = true
         }
-
         initObservables(browserViewModel)
     }
 
@@ -123,17 +122,15 @@ class BrowseFragment : Fragment() {
             }
             true
         }
-        onLongClickListener = { _, _, item, _ ->
-            (item as ThumbnailItemView).thumbnailData?.apply {
-                browserViewModel.addToFavorites(this)
-                Toast.makeText(
-                    requireContext(),
-                    "#$comicNumber added to favorites!",
-                    Toast.LENGTH_SHORT
-                ).show()
+        onLongClickListener = { _, adapter, item, pos ->
+            adapter.fastAdapter?.let {
+                toggleFavorites(item as ThumbnailItemView)
+                // Update the item view appearance when the favorites state has changed.
+                it.notifyAdapterItemChanged(pos)
             }
             true
         }
+        setHasStableIds(true)
     }
 
     /**
@@ -302,11 +299,49 @@ class BrowseFragment : Fragment() {
     }
 
     /**
+     * Save the [ThumbnailData] from the long pressed [ThumbnailItemView] to the favorites database.
+     *
+     * @param item the [ThumbnailItemView] that contains a [ThumbnailData] to save.
+     */
+    private fun saveToFavorites(item: ThumbnailItemView) {
+        item.thumbnailData?.apply {
+            item.isSelected = true
+            isFavorite = true
+            browserViewModel.addToFavorites(this)
+        }
+    }
+
+    /**
+     * Remove the [ThumbnailData] from the favorites database.
+     *
+     * @param item the [ThumbnailItemView] that contains a [ThumbnailData] to be removed.
+     */
+    private fun removeFavorites(item: ThumbnailItemView) {
+        item.thumbnailData?.apply {
+            item.isSelected = false
+            isFavorite = false
+            browserViewModel.removeFromFavorites(this)
+        }
+    }
+
+    /**
      * Hide all loading progress bars.
      */
     private fun hideLoadingProgress() {
         binding.browseSwipeRefresh.isRefreshing = false
         userSwiped = false
         footerItemAdapter.clear()
+    }
+
+    /**
+     * Toggle favorites for a particular item view.
+     */
+    private fun toggleFavorites(item: ThumbnailItemView) {
+        item.thumbnailData?.apply {
+            if (!isFavorite)
+                saveToFavorites(item)
+            else
+                removeFavorites(item)
+        }
     }
 }
