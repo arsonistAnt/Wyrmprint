@@ -34,7 +34,7 @@ import com.github.chrisbanes.photoview.PhotoView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.reader_bottom_sheet_layout.view.*
 
-class ComicPagerFragment : Fragment() {
+class ComicReaderFragment : Fragment() {
     lateinit var binding: FragComicStripReaderBinding
     private var safeArgs: MainReaderActivityArgs? = null
     private val viewModel: ComicPagerViewModel by viewModel { injector.comicPagerViewModel }
@@ -275,7 +275,7 @@ class ComicPagerFragment : Fragment() {
      * @param bottomSheet the [bottomSheetLayout].
      * @param insets the [WindowInsetsCompat] to adjust the layout params to.
      */
-    fun adjustBottomSheetMargin(bottomSheet: View, insets: WindowInsetsCompat) {
+    private fun adjustBottomSheetMargin(bottomSheet: View, insets: WindowInsetsCompat) {
         val marginParams = bottomSheet.layoutParams as ViewGroup.MarginLayoutParams
         marginParams.leftMargin = insets.systemWindowInsetLeft
     }
