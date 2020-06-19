@@ -14,7 +14,7 @@ data class ThumbnailData(
     var pageNumber: Int,
     val thumbnailLarge: String,
     val thumbnailSmall: String,
-    var favorite: Boolean = false
+    var isFavorite: Boolean = false
 )
 
 @Entity(tableName = "thumbnail_favorites")
@@ -40,7 +40,8 @@ interface FavoriteUtil {
 /**
  * Wrap a [ThumbnailData] object into a [ThumbnailItemView] and return it.
  */
-fun ThumbnailData.toThumbnailItemView() = ThumbnailItemView(this)
+fun ThumbnailData.toThumbnailItemView() = ThumbnailItemView(this, true)
+    .apply { identifier = this@toThumbnailItemView.comicId.toLong() }
 
 /**
  * Convert thumbnail data to [ThumbnailFavorite] objects.

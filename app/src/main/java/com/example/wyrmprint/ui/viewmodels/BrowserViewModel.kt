@@ -6,10 +6,10 @@ import androidx.paging.PagedList
 import com.example.wyrmprint.data.database.repository.ComicRepository
 import com.example.wyrmprint.data.model.NetworkStatus
 import com.example.wyrmprint.data.model.ThumbnailData
+import com.example.wyrmprint.data.model.toFavoriteThumbnail
 import com.example.wyrmprint.data.remote.pager.ThumbnailComicDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class BrowserViewModel @Inject constructor(private val comicRepo: ComicRepository) : ViewModel() {
@@ -52,6 +52,19 @@ class BrowserViewModel @Inject constructor(private val comicRepo: ComicRepositor
     fun addToFavorites(thumbnailData: ThumbnailData) {
         viewModelScope.launch(Dispatchers.IO) {
             comicRepo.saveFavoriteComic(thumbnailData)
+            comicRepo.updateCachedThumbnail(thumbnailData)
+        }
+    }
+
+    /**
+     * Remove the thumbnail from the favorites section of the comic repository.
+     *
+     * @param thumbnailData the thumbnail to remove.
+     */
+    fun removeFromFavorites(thumbnailData: ThumbnailData) {
+        viewModelScope.launch(Dispatchers.IO) {
+            comicRepo.removeFavoriteComics(listOf(thumbnailData.toFavoriteThumbnail()))
+            comicRepo.updateCachedThumbnail(thumbnailData)
         }
     }
 }

@@ -4,6 +4,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PageKeyedDataSource
 import com.example.wyrmprint.data.database.ThumbnailCacheDao
+import com.example.wyrmprint.data.database.ThumbnailFavoritesDao
 import com.example.wyrmprint.data.model.NetworkStatus
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.toThumbnailData
@@ -21,7 +22,8 @@ import javax.inject.Inject
 class ThumbnailComicDataSource @Inject constructor(
     private val dragaliaApi: DragaliaLifeApi,
     private val disposables: CompositeDisposable,
-    private val thumbnailCacheDao: ThumbnailCacheDao
+    private val thumbnailCacheDao: ThumbnailCacheDao,
+    private val favorite: ThumbnailFavoritesDao
 ) : PageKeyedDataSource<Int, ThumbnailData>() {
 
     // Represents the current state of the thumbnail paging requests.
@@ -112,7 +114,11 @@ class ThumbnailComicDataSource @Inject constructor(
      */
     private fun fetchThumbnailPage(pageNum: Int) = dragaliaApi.fetchComicStripPage(pageNum)
         .map {
-            val sourceList = it.toThumbnailData(pageNum)
+            val sourceList = it.toThumbnailData(pageNum).map { thumbnailData ->
+                // Check if the data is already in the favorites table.
+                thumbnailData.isFavorite = favorite.count(thumbnailData.comicId) != 0
+                thumbnailData
+            }
             thumbnailCacheDao.insertThumbnailData(sourceList)
             sourceList
         }
