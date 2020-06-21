@@ -28,12 +28,17 @@ data class ThumbnailFavorite(
     val thumbnailSmall: String
 )
 
-interface FavoriteUtil {
+interface ModelUtils {
     companion object {
         /**
          * Create an empty Thumbnail Favorite object.
          */
         fun createEmptyThumbnailFavorite() = ThumbnailFavorite(-1, "", -1, "", "", "")
+
+        /**
+         * Create an empty [ThumbnailData] object.
+         */
+        fun createEmptyThumbnailData() = ThumbnailData(-1, "", -1, "", -1, "", "")
     }
 }
 

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wyrmprint.data.model.ModelUtils
 import com.example.wyrmprint.data.model.NetworkStatus
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.toThumbnailItemView
@@ -29,6 +30,8 @@ import com.mikepenz.fastadapter.IItem
 import com.mikepenz.fastadapter.adapters.GenericItemAdapter
 import com.mikepenz.fastadapter.paged.ExperimentalPagedSupport
 import com.mikepenz.fastadapter.paged.GenericPagedModelAdapter
+import com.mikepenz.fastadapter.select.SelectExtension
+import com.mikepenz.fastadapter.select.getSelectExtension
 import com.mikepenz.fastadapter.ui.items.ProgressItem
 
 /**
@@ -40,6 +43,7 @@ class BrowseFragment : Fragment() {
     private lateinit var browsePageItemAdapter: GenericPagedModelAdapter<ThumbnailData>
     private lateinit var footerItemAdapter: GenericItemAdapter
     private lateinit var fastAdapter: GenericFastAdapter
+    private lateinit var selectionExt: SelectExtension<*>
     private val browserViewModel: BrowserViewModel by viewModel { injector.browserViewModel }
 
     // Default span count for different orientations.
@@ -111,9 +115,9 @@ class BrowseFragment : Fragment() {
             footerItemAdapter
         )
     ).apply {
-        registerTypeInstance(ThumbnailItemView(null))
+        registerTypeInstance(ThumbnailItemView(ModelUtils.createEmptyThumbnailData()))
         onClickListener = { _, _, item, _ ->
-            (item as ThumbnailItemView).thumbnailData?.apply {
+            (item as ThumbnailItemView).model.apply {
                 val action = BrowseFragmentDirections.actionBrowseFragmentToComicPagerActivity(
                     comicUrl,
                     comicId
@@ -124,9 +128,8 @@ class BrowseFragment : Fragment() {
         }
         onLongClickListener = { _, adapter, item, pos ->
             adapter.fastAdapter?.let {
-                toggleFavorites(item as ThumbnailItemView)
                 // Update the item view appearance when the favorites state has changed.
-                it.notifyAdapterItemChanged(pos)
+                toggleFavorites(item as ThumbnailItemView, pos)
             }
             true
         }
@@ -141,7 +144,7 @@ class BrowseFragment : Fragment() {
     private fun initBrowserRecyclerView(browser: RecyclerView) {
         // Create a generic fast adapter that will take in a paged model adapter and a generic item adapter.
         fastAdapter = createFastAdapter()
-
+        selectionExt = fastAdapter.getSelectExtension()
         // Init grid layout manager & set span size lookup for ProgressItem.
         val gridLayoutManager = getGridLayoutManager(fastAdapter)
 
@@ -165,7 +168,6 @@ class BrowseFragment : Fragment() {
                 Observer { thumbnailPagedList ->
                     updateThumbnailPagedList(thumbnailPagedList)
                 })
-
             thumbnailNetworkStatus.observe(
                 viewLifecycleOwner,
                 Observer {
@@ -303,10 +305,10 @@ class BrowseFragment : Fragment() {
      *
      * @param item the [ThumbnailItemView] that contains a [ThumbnailData] to save.
      */
-    private fun saveToFavorites(item: ThumbnailItemView) {
-        item.thumbnailData?.apply {
-            item.isSelected = true
+    private fun saveToFavorites(item: ThumbnailItemView, pos: Int) {
+        item.model.apply {
             isFavorite = true
+            fastAdapter.getSelectExtension().select(pos)
             browserViewModel.addToFavorites(this)
         }
     }
@@ -316,10 +318,10 @@ class BrowseFragment : Fragment() {
      *
      * @param item the [ThumbnailItemView] that contains a [ThumbnailData] to be removed.
      */
-    private fun removeFavorites(item: ThumbnailItemView) {
-        item.thumbnailData?.apply {
-            item.isSelected = false
+    private fun removeFavorites(item: ThumbnailItemView, pos: Int) {
+        item.model.apply {
             isFavorite = false
+            fastAdapter.getSelectExtension().deselect(pos)
             browserViewModel.removeFromFavorites(this)
         }
     }
@@ -335,13 +337,17 @@ class BrowseFragment : Fragment() {
 
     /**
      * Toggle favorites for a particular item view.
+     *
+     * @param item the [ThumbnailItemView] that contains the comic data of interest.
+     * @param pos the position of the [item] in the recycler view.
      */
-    private fun toggleFavorites(item: ThumbnailItemView) {
-        item.thumbnailData?.apply {
-            if (!isFavorite)
-                saveToFavorites(item)
-            else
-                removeFavorites(item)
+    private fun toggleFavorites(item: ThumbnailItemView, pos: Int) {
+        item.model.apply {
+            if (!isFavorite) {
+                saveToFavorites(item, pos)
+            } else {
+                removeFavorites(item, pos)
+            }
         }
     }
 }
