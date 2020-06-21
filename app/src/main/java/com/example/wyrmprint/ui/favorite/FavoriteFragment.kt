@@ -12,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wyrmprint.R
-import com.example.wyrmprint.data.model.FavoriteUtil.Companion.createEmptyThumbnailFavorite
 import com.example.wyrmprint.data.model.toFavoriteThumbnail
 import com.example.wyrmprint.data.model.toThumbnailItemView
 import com.example.wyrmprint.databinding.FragFavoriteLayoutBinding
@@ -125,8 +124,8 @@ class FavoriteFragment : Fragment() {
             var shouldConsume = false
             // If action mode is active then don't use this click listener.
             if (!actionModeHelper.isActive) {
-                val thumbnailData = item.thumbnailData
-                thumbnailData?.apply {
+                val thumbnailData = item.model
+                thumbnailData.apply {
                     val toReaderAction =
                         FavoriteFragmentDirections.actionFavoriteFragmentToComicPagerActivity(
                             comicUrl,
@@ -260,7 +259,7 @@ class FavoriteFragment : Fragment() {
          */
         private fun removeFavoritesOnMultiSelect() {
             val favoriteList = selectExtension.selectedItems.map {
-                it.thumbnailData?.toFavoriteThumbnail() ?: createEmptyThumbnailFavorite()
+                it.model.toFavoriteThumbnail()
             }.toList()
             viewModel.removeFavorites(favoriteList)
         }

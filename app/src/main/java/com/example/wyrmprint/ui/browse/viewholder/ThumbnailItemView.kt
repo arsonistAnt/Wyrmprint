@@ -7,14 +7,14 @@ import coil.api.load
 import com.example.wyrmprint.R
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.mikepenz.fastadapter.FastAdapter
-import com.mikepenz.fastadapter.items.AbstractItem
+import com.mikepenz.fastadapter.items.ModelAbstractItem
 import com.mikepenz.fastadapter.ui.utils.FastAdapterUIUtils
 
 open class ThumbnailItemView(
-    val thumbnailData: ThumbnailData?,
+    thumbnailData: ThumbnailData,
     autoHighlight: Boolean = false
 ) :
-    AbstractItem<ThumbnailItemView.ThumbnailCardHolder>() {
+    ModelAbstractItem<ThumbnailData, ThumbnailItemView.ThumbnailCardHolder>(thumbnailData) {
     override val layoutRes: Int
         get() = R.layout.thumbnail_item
     override val type: Int
@@ -32,8 +32,8 @@ open class ThumbnailItemView(
      * Checks if the [ThumbnailItemView] status should be set as selected.
      */
     private fun shouldSelectAsFavorite() {
-        thumbnailData?.apply {
-            isSelected = thumbnailData.isFavorite
+        model.apply {
+            isSelected = model.isFavorite
         }
     }
 
@@ -49,12 +49,12 @@ open class ThumbnailItemView(
         }
 
         override fun bindView(item: ThumbnailItemView, payloads: MutableList<Any>) {
-            thumbnailImage?.load(item.thumbnailData?.thumbnailLarge) {
+            thumbnailImage?.load(item.model.thumbnailLarge) {
                 placeholder(R.drawable.loading_placeholder)
                 error(R.drawable.error_connection)
             }
-            thumbnailTitle?.text = item.thumbnailData?.comicTitle.toString()
-            thumbnailComicNum?.text = item.thumbnailData?.comicNumber.toString()
+            thumbnailTitle?.text = item.model.comicTitle
+            thumbnailComicNum?.text = item.model.comicNumber.toString()
         }
 
         override fun unbindView(item: ThumbnailItemView) {

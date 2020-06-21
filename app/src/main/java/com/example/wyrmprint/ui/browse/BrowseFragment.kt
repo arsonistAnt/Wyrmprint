@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wyrmprint.data.model.ModelUtils
 import com.example.wyrmprint.data.model.NetworkStatus
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.toThumbnailItemView
@@ -111,9 +112,9 @@ class BrowseFragment : Fragment() {
             footerItemAdapter
         )
     ).apply {
-        registerTypeInstance(ThumbnailItemView(null))
+        registerTypeInstance(ThumbnailItemView(ModelUtils.createEmptyThumbnailData()))
         onClickListener = { _, _, item, _ ->
-            (item as ThumbnailItemView).thumbnailData?.apply {
+            (item as ThumbnailItemView).model.apply {
                 val action = BrowseFragmentDirections.actionBrowseFragmentToComicPagerActivity(
                     comicUrl,
                     comicId
@@ -304,7 +305,7 @@ class BrowseFragment : Fragment() {
      * @param item the [ThumbnailItemView] that contains a [ThumbnailData] to save.
      */
     private fun saveToFavorites(item: ThumbnailItemView) {
-        item.thumbnailData?.apply {
+        item.model.apply {
             item.isSelected = true
             isFavorite = true
             browserViewModel.addToFavorites(this)
@@ -317,7 +318,7 @@ class BrowseFragment : Fragment() {
      * @param item the [ThumbnailItemView] that contains a [ThumbnailData] to be removed.
      */
     private fun removeFavorites(item: ThumbnailItemView) {
-        item.thumbnailData?.apply {
+        item.model.apply {
             item.isSelected = false
             isFavorite = false
             browserViewModel.removeFromFavorites(this)
@@ -337,7 +338,7 @@ class BrowseFragment : Fragment() {
      * Toggle favorites for a particular item view.
      */
     private fun toggleFavorites(item: ThumbnailItemView) {
-        item.thumbnailData?.apply {
+        item.model.apply {
             if (!isFavorite)
                 saveToFavorites(item)
             else
