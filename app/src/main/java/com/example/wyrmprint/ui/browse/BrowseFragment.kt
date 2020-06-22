@@ -149,9 +149,7 @@ class BrowseFragment : Fragment() {
         val gridLayoutManager = getGridLayoutManager(fastAdapter)
 
         browser.apply {
-            // Ui,
             layoutManager = gridLayoutManager
-            // Config adapter
             adapter = fastAdapter
         }
     }
@@ -345,9 +343,39 @@ class BrowseFragment : Fragment() {
         item.model.apply {
             if (!isFavorite) {
                 saveToFavorites(item, pos)
+                showAddToFavoritesToast(item.model)
             } else {
                 removeFavorites(item, pos)
+                showRemovedFromFavoritesToast(item.model)
             }
         }
+    }
+
+    /**
+     * Show a toast when the comic has been saved to favorites.
+     *
+     * @param data the [ThumbnailData]
+     */
+    private fun showRemovedFromFavoritesToast(data: ThumbnailData) {
+        Toast.makeText(
+            requireContext(),
+            "Added ${data.comicNumber} to favorites.",
+            Toast.LENGTH_SHORT
+        )
+            .show()
+    }
+
+    /**
+     * Show a toast when the comic has been removed from favorites.
+     *
+     * @param data the [ThumbnailData]
+     */
+    private fun showAddToFavoritesToast(data: ThumbnailData) {
+        Toast.makeText(
+            requireContext(),
+            "Added ${data.comicNumber} to favorites.",
+            Toast.LENGTH_SHORT
+        )
+            .show()
     }
 }
