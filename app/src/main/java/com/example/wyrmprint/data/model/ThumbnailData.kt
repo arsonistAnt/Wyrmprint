@@ -17,6 +17,15 @@ data class ThumbnailData(
     var isFavorite: Boolean = false
 )
 
+/**
+ * Data class used to store thumbnail url only from the [ThumbnailData] entity when fetching from the
+ * comic database.
+ */
+data class ThumbnailUrl(
+    val thumbnailLarge: String,
+    val thumbnailSmall: String
+)
+
 @Entity(tableName = "thumbnail_favorites")
 data class ThumbnailFavorite(
     @PrimaryKey

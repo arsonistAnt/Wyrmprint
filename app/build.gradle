@@ -99,7 +99,7 @@ dependencies {
     implementation "androidx.room:room-rxjava2:$room_version"
 
     // Android-Iconics
-    implementation "com.mikepenz:iconics-core:4.0.2"
+    implementation "com.mikepenz:iconics-core:5.0.0"
     implementation "androidx.appcompat:appcompat:$appcompat_ver"
     // Android-Iconics Custom Views & CMD Icons
     implementation 'com.mikepenz:community-material-typeface:3.5.95.1-kotlin@aar'

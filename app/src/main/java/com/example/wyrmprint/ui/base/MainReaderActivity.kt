@@ -1,11 +1,7 @@
 package com.example.wyrmprint.ui.base
 
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.updatePadding
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.navArgs
 import com.example.wyrmprint.R
@@ -13,10 +9,6 @@ import com.example.wyrmprint.injection.InjectionProvider
 import com.example.wyrmprint.injection.component.ActivityComponent
 import com.example.wyrmprint.injection.component.DaggerActivityComponent
 import com.example.wyrmprint.injection.module.ContextModule
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.activity_main_reader.*
-import kotlinx.android.synthetic.main.reader_bottom_sheet_layout.*
-import kotlinx.android.synthetic.main.retry_item_view_holder.*
 import me.zhanghai.android.systemuihelper.SystemUiHelper
 
 
@@ -48,7 +40,6 @@ class MainReaderActivity : AppCompatActivity(), InjectionProvider, UIVisibilityA
         ActivityNavigator.applyPopAnimationsToPendingTransition(this)
     }
 
-
     override fun show() {
         systemUiHelper?.show()
     }
@@ -56,8 +47,6 @@ class MainReaderActivity : AppCompatActivity(), InjectionProvider, UIVisibilityA
     override fun hide() {
         systemUiHelper?.hide()
     }
-
-
 
     /**
      * Initialize the [SystemUiHelper] util object.

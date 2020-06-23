@@ -15,9 +15,9 @@
 
     <LinearLayout
         android:id="@+id/header_container_bottom_sheet"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
         android:paddingBottom="4dp">
@@ -26,6 +26,7 @@
             android:layout_width="match_parent"
 
             android:layout_height="wrap_content">
+
             <ImageButton
                 android:id="@+id/drag_up_btn"
                 android:layout_width="match_parent"
@@ -36,11 +37,10 @@
         </LinearLayout>
 
 
-
         <View
             android:layout_width="match_parent"
-            android:background="@color/light_grey"
-            android:layout_height="1dp"/>
+            android:layout_height="1dp"
+            android:background="@color/light_grey" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -86,38 +86,40 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
-
     </LinearLayout>
 
     <View
-        android:background="@color/light_grey"
         android:layout_width="match_parent"
-        android:layout_height="1dp"/>
+        android:layout_height="1dp"
+        android:background="@color/light_grey" />
 
     <LinearLayout
-        android:orientation="vertical"
-        android:padding="4dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="4dp">
 
         <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent" android:padding="16dp"
-        android:layout_height="wrap_content">
+            android:id="@+id/favorites_menu_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
             <ImageButton
-                android:id="@+id/imageButton"
+                android:id="@+id/favoritesBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 app:srcCompat="@drawable/ic_heart_outline"
                 tools:ignore="ContentDescription" />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/favorites_desc_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="16"
@@ -125,17 +127,21 @@
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:padding="16dp"
-            android:layout_height="wrap_content">
+            android:id="@+id/download_menu_item"
+            android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
             <ImageButton
                 android:id="@+id/imageButton1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
                 android:layout_weight="1"
+                android:background="@android:color/transparent"
                 app:srcCompat="@drawable/ic_download_circle_outline"
                 tools:ignore="ContentDescription" />
 
@@ -148,25 +154,29 @@
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:id="@+id/share_menu_item"
             android:layout_width="match_parent"
-            android:padding="16dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
             <ImageButton
                 android:id="@+id/imageButton2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
                 android:layout_weight="1"
-                tools:ignore="ContentDescription"
-                app:srcCompat="@drawable/ic_share_variant" />
+                android:background="@android:color/transparent"
+                app:srcCompat="@drawable/ic_share_variant"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/textView2"
-                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="16"
                 android:text="@string/share_comic_desc" />
         </LinearLayout>

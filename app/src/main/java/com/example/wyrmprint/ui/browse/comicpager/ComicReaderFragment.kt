@@ -32,6 +32,9 @@ import com.example.wyrmprint.ui.base.UIVisibilityAction
 import com.example.wyrmprint.ui.viewmodels.ComicPagerViewModel
 import com.github.chrisbanes.photoview.PhotoView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
+import com.mikepenz.iconics.utils.sizeDp
 import kotlinx.android.synthetic.main.reader_bottom_sheet_layout.view.*
 
 class ComicReaderFragment : Fragment() {
@@ -42,6 +45,7 @@ class ComicReaderFragment : Fragment() {
 
     private var bottomSheetLayout: View? = null
     private var bottomBehavior: BottomSheetBehavior<View>? = null
+    private var currComicStrip: ComicStrip? = null
 
     // Comic strip image size
     private val imgWidth = 650
@@ -83,7 +87,6 @@ class ComicReaderFragment : Fragment() {
         viewModel.onOrientationChange(newConfig.orientation)
     }
 
-
     /**
      * Create the [retryButton] Button.
      */
@@ -110,6 +113,7 @@ class ComicReaderFragment : Fragment() {
      * Add the previous and next buttons listener on the bottom sheet header in the [MainReaderActivity].
      */
     private fun addComicButtonListeners(bottomSheetLayout: View) {
+        // Setup Comic navigation buttons.
         val prevBtn = bottomSheetLayout.prev_comic_btn
         val nextBtn = bottomSheetLayout.next_comic_btn
         prevBtn.setOnClickListener {
@@ -119,11 +123,18 @@ class ComicReaderFragment : Fragment() {
             viewModel.requestComicDetails(viewModel.nextComicId)
         }
 
+        val favoritesItem = bottomSheetLayout.favorites_menu_item
+        favoritesItem.setOnClickListener {
+            currComicStrip?.let {
+                viewModel.toggleFavorites(it)
+            }
+        }
+
         // Set click listener for expand button to expand and collapse reader sheet.
         val dragUpBtn = bottomSheetLayout.drag_up_btn
         dragUpBtn.setOnClickListener {
             bottomBehavior?.apply {
-                state = when(state){
+                state = when (state) {
                     BottomSheetBehavior.STATE_COLLAPSED -> BottomSheetBehavior.STATE_EXPANDED
                     BottomSheetBehavior.STATE_EXPANDED -> BottomSheetBehavior.STATE_COLLAPSED
                     else -> BottomSheetBehavior.STATE_SETTLING
@@ -189,21 +200,63 @@ class ComicReaderFragment : Fragment() {
                 (requireActivity() as UIVisibilityAction).hide()
             }
         })
-
-        viewModel.comicDetailsState.observe(viewLifecycleOwner, Observer { comicNetworkState ->
-            when {
-                comicNetworkState.success -> {
-                    comicNetworkState.data?.let {
-                        configureImageViewScale(it.comicUrl, binding.comicStrip)
-                        updateComicInfo(it)
-                        viewModel.prevComicId = it.prevStrip.id
-                        viewModel.nextComicId = it.nextStrip.id
-                    }
-                }
-                comicNetworkState.inProgress -> binding.comicStripLoader.visibility = View.VISIBLE
-                else -> handleNetworkError(comicNetworkState)
-            }
+        viewModel.isSavedToFavorites.observe(viewLifecycleOwner, Observer {
+            toggleFavorites(it)
         })
+        viewModel.comicDetailsState.observe(
+            viewLifecycleOwner,
+            Observer {
+                handleNetworkStateUI(it)
+            })
+    }
+
+    /**
+     * Toggles the [bottomSheetLayout]'s favorite icon and message if the comic strip has been saved to the favorites.
+     *
+     * @param isFavorited a boolean specifying whether or not to show the outlined heart or solid filled heart.
+     */
+    private fun toggleFavorites(isFavorited: Boolean) {
+        val favoritesText = bottomSheetLayout?.favorites_desc_text
+        val favoriteImageBtn = bottomSheetLayout?.favoritesBtn
+        if (isFavorited) {
+            val removeFavoriteText = getString(R.string.remove_from_fav_desc)
+            favoritesText?.text = removeFavoriteText
+            val heartDrawable =
+                IconicsDrawable(requireContext(), CommunityMaterial.Icon2.cmd_heart).apply {
+                    sizeDp = 24
+                }
+            favoriteImageBtn?.setImageDrawable(heartDrawable)
+        } else {
+            val addFavoritesText = getString(R.string.save_to_fav_desc)
+            val heartOutlineDrawable =
+                IconicsDrawable(requireContext(), CommunityMaterial.Icon2.cmd_heart_outline)
+                    .apply {
+                        sizeDp = 24
+                    }
+            favoritesText?.text = addFavoritesText
+            favoriteImageBtn?.setImageDrawable(heartOutlineDrawable)
+        }
+    }
+
+    /**
+     * Handle the requesting network state for the [ComicStrip] and show user appropriate UI.
+     *
+     * @param comicNetworkState [NetworkState] object to handle.
+     */
+    private fun handleNetworkStateUI(comicNetworkState: NetworkState<ComicStrip>) {
+        when {
+            comicNetworkState.success -> {
+                comicNetworkState.data?.let {
+                    configureImageViewScale(it.comicUrl, binding.comicStrip)
+                    updateComicInfo(it)
+                    viewModel.prevComicId = it.prevStrip.id
+                    viewModel.nextComicId = it.nextStrip.id
+                }
+            }
+            comicNetworkState.inProgress -> binding.comicStripLoader.visibility =
+                View.VISIBLE
+            else -> handleNetworkError(comicNetworkState)
+        }
     }
 
     /**
@@ -266,6 +319,7 @@ class ComicReaderFragment : Fragment() {
             .text = comicInfo.title
         (requireActivity() as AppCompatActivity).supportActionBar
             ?.title = "Dragalia Life | #${comicInfo.episodeNumber}"
+        currComicStrip = comicInfo
     }
 
     /**

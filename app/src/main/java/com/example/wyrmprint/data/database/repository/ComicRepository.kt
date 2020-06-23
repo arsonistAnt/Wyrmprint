@@ -4,6 +4,7 @@ import com.example.wyrmprint.data.database.ThumbnailCacheDao
 import com.example.wyrmprint.data.database.ThumbnailFavoritesDao
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.example.wyrmprint.data.model.ThumbnailFavorite
+import com.example.wyrmprint.data.model.ThumbnailUrl
 import com.example.wyrmprint.data.model.toFavoriteThumbnail
 import com.example.wyrmprint.data.remote.DragaliaLifeApi
 import com.example.wyrmprint.data.remote.pager.ThumbnailDataSourceFactory
@@ -62,6 +63,15 @@ class ComicRepository @Inject constructor(
     }
 
     /**
+     * Remove favorites from the favorites table.
+     *
+     * @param favoriteIds a list of comic id's
+     */
+    fun removeFavoriteComicsById(favoriteIds: List<Int>) {
+        favoritesDao.deleteById(favoriteIds)
+    }
+
+    /**
      * Update the thumbnail data field in the [thumbnailCacheDao].
      */
     fun updateCachedThumbnail(thumbnailData: ThumbnailData) {
@@ -73,5 +83,24 @@ class ComicRepository @Inject constructor(
      */
     fun updateThumbnailFavoritesField(comicIdList: List<Int>, isFavorite: Boolean) {
         thumbnailCacheDao.updateFavorites(comicIdList, isFavorite)
+    }
+
+    /**
+     * Get a [ThumbnailUrl] object from the [ThumbnailCacheDao].
+     *
+     * @param comicId the comic id to search for in the database table.
+     * @return a [ThumbnailUrl] object.
+     */
+    fun getThumbnailUrlFromCache(comicId: Int): ThumbnailUrl? {
+        return thumbnailCacheDao.getThumbnailUrl(comicId)
+    }
+
+    /**
+     * Return the a number 0 or 1 whether the comic ID is in the favorites table.
+     *
+     * @param comicId the comic id to search for in the favorites table.
+     */
+    fun isFavorited(comicId: Int): Int {
+        return favoritesDao.count(comicId)
     }
 }

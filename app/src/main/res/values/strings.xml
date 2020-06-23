@@ -9,14 +9,22 @@
     <string name="thumbnail_title_place_holder">Title_Place_Holder</string>
     <string name="thumbnail_chapter_number">number</string>
     <string name="thumbnail_num_pound">#</string>
+
+    <!-- Favorites -->
     <string name="no_favorites_message" tools:ignore="TypographyEllipsis">No comic strips have been added to the favorites list...</string>
-    <string name="retry_item_button_str">Retry</string>
-    <string name="comic_title_placeholder">Comic Title</string>
+
+    <!-- Favorite Multi-selection -->
     <string name="remove_menu_item">Remove</string>
+    <string name="select_all_menu_item_desc">Select All</string>
+
+    <!-- Network Handling -->
+    <string name="retry_loading_msg">Retry</string>
+    <string name="retry_item_button_str">Retry</string>
+
+    <!-- Comic Reader Bottom Sheet -->
     <string name="share_comic_desc">Share comic via…</string>
     <string name="download_comic_desc">Download comic…</string>
     <string name="save_to_fav_desc">Save to favorites…</string>
-    <string name="retry_loading_msg">Retry</string>
-    <string name="select_all_menu_item_desc">Select All</string>
-    <string name="un_select_all_menu_item_desc">Un-select All</string>
+    <string name="remove_from_fav_desc">Remove from favorites…</string>
+    <string name="comic_title_placeholder">Comic Title</string>
 </resources>
