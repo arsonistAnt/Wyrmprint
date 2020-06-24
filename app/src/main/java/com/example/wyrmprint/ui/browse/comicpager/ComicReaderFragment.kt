@@ -1,6 +1,7 @@
 package com.example.wyrmprint.ui.browse.comicpager
 
 import android.app.Activity
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Gravity
@@ -128,6 +129,17 @@ class ComicReaderFragment : Fragment() {
             currComicStrip?.let {
                 viewModel.toggleFavorites(it)
             }
+        }
+
+        val shareItem = bottomSheetLayout.share_menu_item
+        shareItem.setOnClickListener {
+            val shareComicUrlIntent = Intent()
+            shareComicUrlIntent.apply {
+                action = Intent.ACTION_SEND
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, "${currComicStrip?.comicUrl}")
+            }
+            startActivity(Intent.createChooser(shareComicUrlIntent, "Choose"))
         }
 
         // Set click listener for expand button to expand and collapse reader sheet.
