@@ -1,5 +1,6 @@
 package com.example.wyrmprint.ui.browse.comicpager
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
@@ -33,6 +34,7 @@ import com.example.wyrmprint.ui.base.UIVisibilityAction
 import com.example.wyrmprint.ui.viewmodels.ComicPagerViewModel
 import com.github.chrisbanes.photoview.PhotoView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.livinglifetechway.quickpermissions_kotlin.runWithPermissions
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.community.material.CommunityMaterial
 import com.mikepenz.iconics.utils.sizeDp
@@ -140,6 +142,16 @@ class ComicReaderFragment : Fragment() {
                 putExtra(Intent.EXTRA_TEXT, "${currComicStrip?.comicUrl}")
             }
             startActivity(Intent.createChooser(shareComicUrlIntent, "Choose"))
+        }
+
+        val downloadItem = bottomSheetLayout.download_menu_item
+        downloadItem.setOnClickListener {
+            // TODO: Different methods of  downloading https://stackoverflow.com/questions/15549421/how-to-download-and-save-an-image-in-android
+            // TODO: Basic method of download manager, let android handle it! https://developer.android.com/reference/android/app/DownloadManager.html
+            checkForDownloadPermissions {
+                // TODO 2. Directory Chooser
+                // TODO 3. Initiate Download of comic
+            }
         }
 
         // Set click listener for expand button to expand and collapse reader sheet.
@@ -345,4 +357,16 @@ class ComicReaderFragment : Fragment() {
         val marginParams = bottomSheet.layoutParams as ViewGroup.MarginLayoutParams
         marginParams.leftMargin = insets.systemWindowInsetLeft
     }
+
+
+    /**
+     *  Check for download permissions before performing the action.
+     *
+     *  @param action the action to perform after permissions have been checked.
+     */
+    private fun checkForDownloadPermissions(action: () -> Unit) = runWithPermissions(
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.ACCESS_WIFI_STATE,
+        Manifest.permission.INTERNET
+    ) { action() }
 }
