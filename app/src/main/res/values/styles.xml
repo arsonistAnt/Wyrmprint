@@ -8,7 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowActionModeOverlay">true</item>
         <!-- Back ground color for CAB -->
-        <item name="android:actionModeBackground">@color/colorPrimary</item>
+        <item name="actionModeStyle">@style/ActionModeRed</item>
+        <item name="android:actionModeStyle">@color/colorPrimary</item>
+
     </style>
 
     <!-- Thumbnail Item Theme -->
@@ -39,6 +41,12 @@
         <item name="android:textAlignment">center</item>
         <item name="android:textColor">@color/dodger_blue</item>
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- Action Mode Style -->
+    <style name="ActionModeRed" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="background">@color/colorPrimary</item>
     </style>
 
 
