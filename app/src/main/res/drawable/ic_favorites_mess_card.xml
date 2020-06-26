@@ -1,23 +1,4 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="800dp"
-    android:height="500dp"
-    android:viewportWidth="800"
-    android:viewportHeight="500">
-    <path
-        android:pathData="M777.481,448.473l-736.17,33.03l-18.35,-408.983l736.17,-33.03z"
-        android:fillColor="#330000"
-        android:fillAlpha="0.65" />
-    <path
-        android:pathData="M785.669,437.01l-736.17,33.03l-18.35,-408.983l736.17,-33.03z"
-        android:fillColor="#330000"
-        android:fillAlpha="0.65" />
-    <path
-        android:pathData="M775.228,435.438l-736.17,33.03l-18.35,-408.983l736.17,-33.03z"
-        android:fillColor="#330000" />
-    <path
-        android:pathData="M766.422,452.16l-736.911,0l-0,-409.393l736.911,-0z"
-        android:fillColor="#FF4455" />
-    <path
-        android:pathData="M758.228,443.973l-720.535,0l-0,-393.018l720.535,-0z"
-        android:fillColor="#ffffff" />
-</vector>
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/favorites_mess_card" />
+</layer-list>

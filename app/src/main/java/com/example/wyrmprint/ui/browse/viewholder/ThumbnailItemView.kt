@@ -8,7 +8,6 @@ import com.example.wyrmprint.R
 import com.example.wyrmprint.data.model.ThumbnailData
 import com.mikepenz.fastadapter.FastAdapter
 import com.mikepenz.fastadapter.items.ModelAbstractItem
-import com.mikepenz.fastadapter.ui.utils.FastAdapterUIUtils
 
 open class ThumbnailItemView(
     thumbnailData: ThumbnailData,
@@ -41,12 +40,6 @@ open class ThumbnailItemView(
         private val thumbnailImage: ImageView? = view.findViewById(R.id.thumbnail_image)
         private val thumbnailTitle: TextView? = view.findViewById(R.id.thumbnail_title)
         private val thumbnailComicNum: TextView? = view.findViewById(R.id.comic_number)
-
-        init {
-            // Leave default implementation of ripple to the FastAdapter.
-            if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.LOLLIPOP)
-                view.setBackgroundResource(FastAdapterUIUtils.getSelectableBackground(view.context))
-        }
 
         override fun bindView(item: ThumbnailItemView, payloads: MutableList<Any>) {
             thumbnailImage?.load(item.model.thumbnailLarge) {
