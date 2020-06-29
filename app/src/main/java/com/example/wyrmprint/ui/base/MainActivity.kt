@@ -89,12 +89,11 @@ class MainActivity : AppCompatActivity(), InjectionProvider {
             val browseItem = findItem(R.id.browseFragment)
             val favoriteItem = findItem(R.id.favoriteFragment)
             val settingItem = findItem(R.id.item_setting)
-            browseItem.icon = IconicsDrawable(applicationContext)
-                .icon(CommunityMaterial.Icon.cmd_grid)
-            favoriteItem.icon = IconicsDrawable(applicationContext)
-                .icon(CommunityMaterial.Icon2.cmd_heart)
-            settingItem.icon = IconicsDrawable(applicationContext)
-                .icon(CommunityMaterial.Icon.cmd_account_settings)
+            browseItem.icon = IconicsDrawable(applicationContext, CommunityMaterial.Icon.cmd_grid)
+            favoriteItem.icon =
+                IconicsDrawable(applicationContext, CommunityMaterial.Icon2.cmd_heart)
+            settingItem.icon =
+                IconicsDrawable(applicationContext, CommunityMaterial.Icon.cmd_account_settings)
         }
 
     private fun timberSetup() = Timber.plant(Timber.DebugTree())

@@ -359,7 +359,7 @@ class BrowseFragment : Fragment() {
     private fun showRemovedFromFavoritesToast(data: ThumbnailData) {
         Toast.makeText(
             requireContext(),
-            "Added ${data.comicNumber} to favorites.",
+            "Removed ${data.comicNumber} to favorites.",
             Toast.LENGTH_SHORT
         )
             .show()
